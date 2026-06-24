@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>برنامه کار‌های شرکت</title>
+  <title>برنامه کارهای شرکت</title>
   
-  <!-- فونت وزیر -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
   
   <style>
@@ -28,7 +27,6 @@
       padding-top: 5px;
     }
     
-    /* هدر با دکمه sticky */
     .header-sticky {
       position: sticky;
       top: 0;
@@ -52,20 +50,17 @@
       align-items: center;
       gap: 4px;
     }
-    .header-sticky h1 span {
-      font-size: 1.2rem;
-    }
     .header-sticky .btn-today {
       background: linear-gradient(135deg, #4c6fff, #6a3de8);
       border: none;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: 30px;
       color: white;
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
       font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -83,60 +78,181 @@
     .year-badge {
       text-align: center;
       color: #4c6fff;
-      font-size: 1rem;
+      font-size: 0.9rem;
       margin: 6px 0 12px 0;
     }
 
-    /* فرم افزودن تسک - بهینه موبایل */
     .task-form {
       background: #1a1a24;
-      padding: 14px;
+      padding: 16px;
       border-radius: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       margin-bottom: 16px;
+    }
+    .task-form .step {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .task-form .step.active {
+      display: flex;
+    }
+    .task-form .step-title {
+      color: #aaa;
+      font-size: 0.75rem;
+      margin-bottom: 2px;
     }
     .task-form input, .task-form select, .task-form textarea {
       background: #252535;
       border: none;
-      padding: 8px 12px;
-      border-radius: 30px;
+      padding: 14px 16px;
+      border-radius: 16px;
       color: white;
       outline: none;
-      font-size: 0.85rem;
-      min-width: 80px;
-      flex: 1 1 auto;
+      font-size: 1rem;
+      width: 100%;
       font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      -webkit-appearance: none;
+      appearance: none;
     }
     .task-form textarea {
-      min-width: 100px;
       resize: vertical;
-      height: 38px;
-      flex: 2 1 auto;
+      height: 80px;
+      min-height: 60px;
     }
-    .task-form button {
+    .task-form .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .task-form .form-actions button {
       background: #4c6fff;
       border: none;
-      padding: 8px 18px;
-      border-radius: 30px;
+      padding: 14px 20px;
+      border-radius: 16px;
       color: white;
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
       font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
-      font-size: 0.85rem;
-      flex: 1 1 auto;
-      min-width: 80px;
+      font-size: 1rem;
+      flex: 1;
     }
-    .task-form button:hover {
+    .task-form .form-actions button:active {
+      transform: scale(0.95);
+    }
+    .task-form .form-actions button:hover {
       background: #3a56d4;
-      transform: scale(1.02);
+    }
+    .task-form .form-actions button.secondary {
+      background: #333;
+    }
+    .task-form .form-actions button.secondary:hover {
+      background: #444;
     }
 
-    /* انتخاب ماه - بهینه موبایل */
+    /* دکمه‌های انتخاب کاربر در فرم */
+    .user-toggle {
+      display: flex;
+      gap: 10px;
+      direction: rtl;
+    }
+    .user-toggle button {
+      flex: 1;
+      padding: 14px 10px;
+      border-radius: 16px;
+      border: 2px solid #333;
+      background: #1f1f2e;
+      color: #888;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .user-toggle button:active {
+      transform: scale(0.95);
+    }
+    .user-toggle .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #555;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+    .user-toggle button[data-user="Saeed"] .dot {
+      background: transparent;
+      border-color: #4c6fff;
+    }
+    .user-toggle button[data-user="Mohammadreza"] .dot {
+      background: transparent;
+      border-color: #9c27b0;
+    }
+    .user-toggle button.selected[data-user="Saeed"] {
+      border-color: #4c6fff;
+      background: #4c6fff1a;
+      color: #4c6fff;
+      box-shadow: 0 0 20px #4c6fff22;
+    }
+    .user-toggle button.selected[data-user="Saeed"] .dot {
+      background: #4c6fff;
+      box-shadow: 0 0 8px #4c6fff88;
+    }
+    .user-toggle button.selected[data-user="Mohammadreza"] {
+      border-color: #9c27b0;
+      background: #9c27b01a;
+      color: #9c27b0;
+      box-shadow: 0 0 20px #9c27b022;
+    }
+    .user-toggle button.selected[data-user="Mohammadreza"] .dot {
+      background: #9c27b0;
+      box-shadow: 0 0 8px #9c27b088;
+    }
+
+    /* فیلتر کاربر - ۳ دکمه‌ای */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0;
+      justify-content: center;
+    }
+    .filter-bar button {
+      padding: 8px 20px;
+      border-radius: 30px;
+      border: 2px solid #333;
+      background: #1f1f2e;
+      color: #888;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+    }
+    .filter-bar button:active {
+      transform: scale(0.93);
+    }
+    .filter-bar button.selected {
+      border-color: #4c6fff;
+      background: #4c6fff1a;
+      color: #4c6fff;
+      box-shadow: 0 0 15px #4c6fff22;
+    }
+    .filter-bar button[data-filter="Saeed"].selected {
+      border-color: #4c6fff;
+      background: #4c6fff1a;
+      color: #4c6fff;
+    }
+    .filter-bar button[data-filter="Mohammadreza"].selected {
+      border-color: #9c27b0;
+      background: #9c27b01a;
+      color: #9c27b0;
+      box-shadow: 0 0 15px #9c27b022;
+    }
+
     .month-selector {
       display: flex;
       justify-content: center;
@@ -148,32 +264,37 @@
       background: #1f1f2e;
       color: white;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 30px;
       font-size: 0.95rem;
       min-width: 120px;
       cursor: pointer;
       font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 16px center;
+      padding-left: 40px;
     }
     .month-selector button {
       background: #333;
       border: none;
       color: white;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: 30px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
       transition: 0.2s;
       font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
-    .month-selector button:hover {
-      background: #555;
-    }
     .month-selector button:active {
       transform: scale(0.9);
     }
+    .month-selector button:hover {
+      background: #555;
+    }
 
-    /* تقویم - بهینه موبایل */
     .calendar-wrapper {
       display: flex;
       flex-direction: column;
@@ -201,7 +322,7 @@
       font-weight: bold;
       color: #aaa;
       text-align: center;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
     }
     .days-grid {
       display: grid;
@@ -210,8 +331,8 @@
     }
     .day-cell {
       border-radius: 12px;
-      padding: 6px 2px;
-      min-height: 50px;
+      padding: 8px 2px;
+      min-height: 52px;
       cursor: pointer;
       transition: 0.1s;
       display: flex;
@@ -228,7 +349,7 @@
     }
     .day-cell .day-number {
       font-weight: bold;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #ddd;
     }
     .day-cell.today {
@@ -267,7 +388,6 @@
       margin-top: 2px;
     }
 
-    /* لیست تسک‌های روز - بهینه موبایل */
     .day-detail {
       background: #161620;
       border-radius: 20px;
@@ -278,7 +398,7 @@
       color: #fff;
       margin: 0 0 10px 0;
       font-weight: normal;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
     .task-card {
       background: #222235;
@@ -289,6 +409,11 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .task-card:active {
+      transform: scale(0.98);
     }
     .task-card .task-info {
       flex: 1;
@@ -301,6 +426,10 @@
       color: #aaa;
       display: block;
       font-size: 0.7rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
     }
     .task-card .task-actions {
       display: flex;
@@ -311,9 +440,9 @@
       background: #333;
       border: none;
       color: white;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 30px;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       cursor: pointer;
       transition: 0.15s;
       font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
@@ -332,7 +461,6 @@
       opacity: 0.6;
     }
 
-    /* رنگ‌بندی کاربران */
     .task-card.user-saeed { border-right-color: #4c6fff; }
     .task-card.user-mohammadreza { border-right-color: #9c27b0; }
     .task-card .user-badge {
@@ -346,99 +474,120 @@
     .user-badge.saeed { background: #4c6fff33; color: #4c6fff; }
     .user-badge.mohammadreza { background: #9c27b033; color: #9c27b0; }
 
-    /* فیلترها - بهینه موبایل */
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0;
-      justify-content: center;
+    .task-card .full-desc {
+      display: none;
+      background: #1a1a2a;
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #ccc;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      margin-top: 4px;
+      border-top: 1px solid #333;
+      word-break: break-word;
+      white-space: pre-wrap;
     }
-    .filters select {
-      background: #1f1f2e;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 30px;
-      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
-      font-size: 0.75rem;
-      flex: 1 1 auto;
-      min-width: 80px;
+    .task-card.expanded .full-desc {
+      display: block;
+    }
+    .task-card.expanded .task-info small {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+    }
+    .task-card .expand-hint {
+      display: none;
+      color: #666;
+      font-size: 0.6rem;
+      text-align: left;
+      margin-top: -2px;
+    }
+    .task-card.has-desc .expand-hint {
+      display: block;
+    }
+    .task-card.expanded .expand-hint {
+      display: none;
     }
 
-    /* بهبود برای موبایل‌های خیلی کوچک */
     @media (max-width: 480px) {
       body { padding: 6px; }
       .header-sticky h1 { font-size: 0.9rem; }
-      .header-sticky .btn-today { font-size: 0.65rem; padding: 5px 10px; }
-      .day-cell { min-height: 40px; padding: 4px 1px; }
-      .day-cell .day-number { font-size: 0.7rem; }
-      .weekdays { font-size: 0.55rem; gap: 2px; }
+      .header-sticky .btn-today { font-size: 0.7rem; padding: 6px 12px; }
+      .day-cell { min-height: 44px; padding: 6px 1px; }
+      .day-cell .day-number { font-size: 0.75rem; }
+      .weekdays { font-size: 0.6rem; gap: 2px; }
       .days-grid { gap: 2px; }
       .month-title { font-size: 1rem; }
-      .task-form input, .task-form select { font-size: 0.75rem; padding: 6px 10px; min-width: 60px; }
-      .task-form textarea { font-size: 0.75rem; height: 32px; }
-      .task-form button { font-size: 0.75rem; padding: 6px 12px; }
-      .month-selector select { font-size: 0.8rem; padding: 6px 10px; min-width: 90px; }
-      .month-selector button { padding: 4px 10px; font-size: 0.8rem; }
+      .task-form { padding: 12px; }
+      .task-form input, .task-form select, .task-form textarea { padding: 12px 14px; font-size: 0.9rem; }
+      .task-form .form-actions button { padding: 12px 16px; font-size: 0.9rem; }
+      .month-selector select { font-size: 0.8rem; padding: 8px 14px; min-width: 90px; }
+      .month-selector button { padding: 6px 12px; font-size: 0.9rem; }
       .day-cell .selected-dot { width: 6px; height: 6px; }
-      .filters select { font-size: 0.65rem; padding: 4px 8px; min-width: 60px; }
       .task-card .task-info b { font-size: 0.8rem; }
-      .task-card .task-actions button { font-size: 0.55rem; padding: 2px 8px; }
+      .task-card .task-actions button { font-size: 0.6rem; padding: 3px 10px; }
+      .task-form .step-title { font-size: 0.65rem; }
+      .user-toggle button { padding: 12px 8px; font-size: 0.85rem; }
+      .filter-bar button { padding: 6px 14px; font-size: 0.7rem; }
     }
 
     @media (max-width: 380px) {
-      .day-cell { min-height: 35px; }
-      .day-cell .day-number { font-size: 0.6rem; }
-      .weekdays { font-size: 0.45rem; }
+      .day-cell { min-height: 38px; }
+      .day-cell .day-number { font-size: 0.65rem; }
+      .weekdays { font-size: 0.5rem; }
       .header-sticky h1 { font-size: 0.75rem; }
+      .filter-bar button { padding: 5px 10px; font-size: 0.65rem; }
     }
   </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- هدر Sticky با دکمه تسک‌های امروز -->
   <div class="header-sticky">
-    <h1><span>📋</span> برنامه کار‌های شرکت</h1>
+    <h1>برنامه کارهای شرکت</h1>
     <button class="btn-today" onclick="goToToday()">
-      📅 امروز
+      امروز
     </button>
   </div>
 
   <div class="year-badge">سال ۱۴۰۵ شمسی</div>
 
-  <!-- فرم افزودن تسک -->
-  <div class="task-form">
-    <input id="taskTitle" placeholder="عنوان تسک">
-    <textarea id="taskDesc" placeholder="توضیحات"></textarea>
-    <select id="taskUser">
-      <option value="Saeed">سعید</option>
-      <option value="Mohammadreza">محمدرضا</option>
-    </select>
-    <button onclick="addTask()">➕ افزودن</button>
+  <div class="task-form" id="taskForm">
+    <div class="step active" id="step1">
+      <div class="step-title">مرحله ۱ از ۲ - عنوان تسک</div>
+      <input id="taskTitle" placeholder="عنوان تسک را وارد کنید" autofocus>
+      <div class="form-actions">
+        <button onclick="nextStep()">بعدی</button>
+      </div>
+    </div>
+    
+    <div class="step" id="step2">
+      <div class="step-title">مرحله ۲ از ۲ - توضیحات و انتخاب کاربر</div>
+      <textarea id="taskDesc" placeholder="توضیحات (اختیاری)"></textarea>
+      <div class="user-toggle" id="userToggle">
+        <button type="button" data-user="Saeed" class="selected" onclick="selectUser(this)">
+          <span class="dot"></span>
+          سعید
+        </button>
+        <button type="button" data-user="Mohammadreza" onclick="selectUser(this)">
+          <span class="dot"></span>
+          محدرضا
+        </button>
+      </div>
+      <div class="form-actions">
+        <button class="secondary" onclick="prevStep()">قبلی</button>
+        <button onclick="addTask()">+ افزودن</button>
+      </div>
+    </div>
   </div>
 
-  <!-- فیلترها -->
-  <div class="filters">
-    <select id="filterUser" onchange="renderCalendar()">
-      <option value="All">همه کاربران</option>
-      <option value="Saeed">سعید</option>
-      <option value="Mohammadreza">محمدرضا</option>
-    </select>
-    <select id="filterDay" onchange="renderCalendar()">
-      <option value="All">همه روزها</option>
-      <option value="Saturday">شنبه</option>
-      <option value="Sunday">یکشنبه</option>
-      <option value="Monday">دوشنبه</option>
-      <option value="Tuesday">سه‌شنبه</option>
-      <option value="Wednesday">چهارشنبه</option>
-      <option value="Thursday">پنجشنبه</option>
-      <option value="Friday">جمعه</option>
-    </select>
+  <!-- فیلتر کاربر -->
+  <div class="filter-bar" id="filterBar">
+    <button data-filter="All" class="selected" onclick="setFilter(this)">همه</button>
+    <button data-filter="Saeed" onclick="setFilter(this)">سعید</button>
+    <button data-filter="Mohammadreza" onclick="setFilter(this)">محمدرضا</button>
   </div>
 
-  <!-- انتخاب ماه برای نمایش -->
   <div class="month-selector">
     <button onclick="changeMonth(-1)">◀</button>
     <select id="monthSelect" onchange="renderCalendar()">
@@ -458,11 +607,10 @@
     <button onclick="changeMonth(1)">▶</button>
   </div>
 
-  <!-- تقویم و جزئیات روز -->
   <div class="calendar-wrapper">
     <div id="calendarContainer"></div>
     <div id="dayDetail" class="day-detail">
-      <h3>📌 تسک‌های امروز</h3>
+      <h3>تسک‌های امروز</h3>
       <div id="dayTaskList">روزی را انتخاب کنید</div>
     </div>
   </div>
