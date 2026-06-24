@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>تقویم تسک‌ها ۱۴۰۵</title>
+  <title>برنامه کار‌های شرکت</title>
+  
+  <!-- فونت وزیر -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+  
   <style>
     * {
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
     body {
       background: #0f0f14;
@@ -23,6 +27,7 @@
       color: #fff;
       text-align: center;
       margin-bottom: 5px;
+      font-weight: normal;
     }
     .year-badge {
       text-align: center;
@@ -52,6 +57,7 @@
       outline: none;
       font-size: 0.9rem;
       min-width: 120px;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
     .task-form textarea {
       min-width: 160px;
@@ -67,6 +73,7 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
     .task-form button:hover {
       background: #3a56d4;
@@ -90,6 +97,7 @@
       font-size: 1.1rem;
       min-width: 150px;
       cursor: pointer;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
     .month-selector button {
       background: #333;
@@ -100,6 +108,7 @@
       font-size: 1.2rem;
       cursor: pointer;
       transition: 0.2s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
     .month-selector button:hover {
       background: #555;
@@ -190,6 +199,7 @@
     .day-detail h3 {
       color: #fff;
       margin: 0 0 12px 0;
+      font-weight: normal;
     }
     .task-card {
       background: #222235;
@@ -221,6 +231,7 @@
       font-size: 0.75rem;
       cursor: pointer;
       transition: 0.15s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
     .task-card button:hover {
       background: #555;
@@ -244,6 +255,7 @@
       border: none;
       padding: 8px 16px;
       border-radius: 30px;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
     }
 
     @media (max-width: 700px) {
@@ -254,7 +266,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>📅 تقویم تسک‌ها</h1>
+  <h1>📋 برنامه کار‌های شرکت</h1>
   <div class="year-badge">سال ۱۴۰۵ شمسی</div>
 
   <!-- فرم افزودن تسک -->
@@ -263,60 +275,8 @@
     <textarea id="taskDesc" placeholder="توضیحات (اختیاری)"></textarea>
     <select id="taskUser">
       <option value="Saeed">سعید</option>
-      <option value="Moti">متی</option>
+      <option value="Mohammadreza">محمدرضا</option>
     </select>
-    
-    <!-- انتخاب روز -->
-    <select id="taskDay">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="11">11</option>
-      <option value="12">12</option>
-      <option value="13">13</option>
-      <option value="14">14</option>
-      <option value="15">15</option>
-      <option value="16">16</option>
-      <option value="17">17</option>
-      <option value="18">18</option>
-      <option value="19">19</option>
-      <option value="20">20</option>
-      <option value="21">21</option>
-      <option value="22">22</option>
-      <option value="23">23</option>
-      <option value="24">24</option>
-      <option value="25">25</option>
-      <option value="26">26</option>
-      <option value="27">27</option>
-      <option value="28">28</option>
-      <option value="29">29</option>
-      <option value="30">30</option>
-      <option value="31">31</option>
-    </select>
-    
-    <!-- انتخاب ماه -->
-    <select id="taskMonth">
-      <option value="1">فروردین</option>
-      <option value="2">اردیبهشت</option>
-      <option value="3">خرداد</option>
-      <option value="4">تیر</option>
-      <option value="5">مرداد</option>
-      <option value="6">شهریور</option>
-      <option value="7">مهر</option>
-      <option value="8">آبان</option>
-      <option value="9">آذر</option>
-      <option value="10">دی</option>
-      <option value="11">بهمن</option>
-      <option value="12">اسفند</option>
-    </select>
-    
     <button onclick="addTask()">➕ افزودن تسک</button>
   </div>
 
@@ -325,7 +285,7 @@
     <select id="filterUser" onchange="renderCalendar()">
       <option value="All">همه کاربران</option>
       <option value="Saeed">سعید</option>
-      <option value="Moti">متی</option>
+      <option value="Mohammadreza">محمدرضا</option>
     </select>
     <select id="filterDay" onchange="renderCalendar()">
       <option value="All">همه روزها</option>
