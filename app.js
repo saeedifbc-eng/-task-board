@@ -76,9 +76,13 @@ function addTask() {
   const title = document.getElementById("taskTitle").value.trim();
   const desc = document.getElementById("taskDesc").value.trim();
   const user = document.getElementById("taskUser").value;
-  const day = parseInt(document.getElementById("taskDay").value);
-  const month = parseInt(document.getElementById("taskMonth").value);
-  const year = 1405;
+  
+  if (!selectedDate) {
+    alert("لطفاً ابتدا یک روز را در تقویم انتخاب کنید");
+    return;
+  }
+  
+  const [year, month, day] = selectedDate.split('-').map(Number);
   
   if (!title) { alert("لطفاً عنوان تسک را وارد کنید"); return; }
   
@@ -146,7 +150,21 @@ function renderCalendar() {
     
     const dateKey = toDateKey(year, m+1, d);
     
-    let hasTask = tasks.some(t => {
+    // ==============================================
+    // بررسی وضعیت تسک‌های این روز
+    // ==============================================
+    const dayTasks = tasks.filter(t => t.date === dateKey);
+    const allDone = dayTasks.length > 0 && dayTasks.every(t => t.done === true);
+    const hasAnyTask = dayTasks.length > 0;
+    
+    // اگر همه تسک‌ها انجام شده باشند، رنگ سبز
+    if (allDone) {
+      cell.style.background = "#1a3a2a";
+      cell.style.borderColor = "#2e7d32";
+    }
+    
+    // بررسی تسک‌ها با فیلترها برای نمایش نشان‌گر
+    let hasTaskWithFilter = tasks.some(t => {
       if (t.date !== dateKey) return false;
       if (userFilter !== "All" && t.user !== userFilter) return false;
       if (dayFilter !== "All") {
@@ -157,29 +175,45 @@ function renderCalendar() {
       return true;
     });
     
-    if (hasTask) cell.classList.add("has-task");
+    if (hasTaskWithFilter) cell.classList.add("has-task");
     if (today.year === year && today.month === m+1 && today.day === d) cell.classList.add("today");
     
+    // ==============================================
+    // نمایش شماره روز + دایره سبز اگر انتخاب شده باشد
+    // ==============================================
     const numSpan = document.createElement("span");
     numSpan.className = "day-number";
     numSpan.textContent = d;
     cell.appendChild(numSpan);
     
-    if (hasTask) {
+    // اگر این روز همان روز انتخاب‌شده است، دایره سبز کنارش بگذار
+    if (selectedDate === dateKey) {
+      const dot = document.createElement("span");
+      dot.style.cssText = `
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background: #4caf50;
+        border-radius: 50%;
+        margin-right: 4px;
+        box-shadow: 0 0 8px #4caf50;
+        vertical-align: middle;
+      `;
+      cell.appendChild(dot);
+    }
+    
+    if (hasTaskWithFilter) {
       const ind = document.createElement("span");
       ind.className = "task-indicator";
       ind.textContent = "📌";
       cell.appendChild(ind);
     }
     
-    // کلیک روی روز: نمایش تسک‌ها و انتخاب تاریخ در فرم
+    // کلیک روی روز: انتخاب تاریخ و نمایش تسک‌ها
     cell.addEventListener("click", () => {
       selectedDate = dateKey;
+      renderCalendar(); // برای به‌روزرسانی دایره سبز
       showDayTasks(dateKey);
-      
-      // تنظیم منوهای روز و ماه در فرم افزودن تسک
-      document.getElementById("taskDay").value = d;
-      document.getElementById("taskMonth").value = m + 1;
     });
     
     daysGrid.appendChild(cell);
@@ -272,10 +306,6 @@ loadTasks();
 const today = getTodayPersian();
 currentMonth = today.month - 1;
 document.getElementById("monthSelect").value = currentMonth;
-renderCalendar();
 selectedDate = toDateKey(today.year, today.month, today.day);
+renderCalendar();
 showDayTasks(selectedDate);
-
-// تنظیم فرم با تاریخ امروز
-document.getElementById("taskDay").value = today.day;
-document.getElementById("taskMonth").value = today.month;
