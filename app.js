@@ -50,6 +50,20 @@ function toDateKey(py, pm, pd) {
 }
 
 // ============================
+// دکمه تسک‌های امروز
+// ============================
+function goToToday() {
+  const today = getTodayPersian();
+  currentMonth = today.month - 1;
+  document.getElementById("monthSelect").value = currentMonth;
+  selectedDate = toDateKey(today.year, today.month, today.day);
+  renderCalendar();
+  showDayTasks(selectedDate);
+  
+  document.querySelector('.calendar-wrapper').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============================
 // بارگذاری و ذخیره
 // ============================
 function loadTasks() {
@@ -70,7 +84,7 @@ function changeMonth(delta) {
 }
 
 // ============================
-// افزودن تسک (با انتخاب تاریخ از تقویم)
+// افزودن تسک
 // ============================
 function addTask() {
   const title = document.getElementById("taskTitle").value.trim();
@@ -104,7 +118,7 @@ function addTask() {
 }
 
 // ============================
-// رندر تقویم (فقط ماه جاری)
+// رندر تقویم (بدون نقطه‌های رنگی)
 // ============================
 function renderCalendar() {
   const container = document.getElementById("calendarContainer");
@@ -144,75 +158,73 @@ function renderCalendar() {
   }
   
   const today = getTodayPersian();
+  const todayDate = new Date();
+  const todayTimestamp = todayDate.getTime();
+  
   for (let d = 1; d <= monthDays[m]; d++) {
     const cell = document.createElement("div");
     cell.className = "day-cell";
     
     const dateKey = toDateKey(year, m+1, d);
     
-    // ==============================================
-    // بررسی وضعیت تسک‌های این روز
-    // ==============================================
-    const dayTasks = tasks.filter(t => t.date === dateKey);
-    const allDone = dayTasks.length > 0 && dayTasks.every(t => t.done === true);
-    const hasAnyTask = dayTasks.length > 0;
+    // محاسبه تاریخ میلادی برای مقایسه با امروز
+    const gDate = toGregorian(year, m+1, d);
+    const cellDate = new Date(gDate.year, gDate.month - 1, gDate.day);
+    const cellTimestamp = cellDate.getTime();
+    const isPast = cellTimestamp < todayTimestamp && !(today.year === year && today.month === m+1 && today.day === d);
+    const isToday = (today.year === year && today.month === m+1 && today.day === d);
     
-    // اگر همه تسک‌ها انجام شده باشند، رنگ سبز
-    if (allDone) {
-      cell.style.background = "#1a3a2a";
-      cell.style.borderColor = "#2e7d32";
+    // دریافت تسک‌های این روز
+    const dayTasks = tasks.filter(t => t.date === dateKey);
+    const hasUnfinished = dayTasks.some(t => t.done === false);
+    const allDone = dayTasks.length > 0 && dayTasks.every(t => t.done === true);
+    
+    // ==============================================
+    // رنگ‌بندی سلول بر اساس قوانین
+    // ==============================================
+    if (isToday) {
+      // امروز: همیشه زرد
+      cell.style.background = "#2a2a1a";
+      cell.style.borderColor = "#ffbb33";
+      cell.classList.add("today");
+    } else if (isPast) {
+      // روزهای گذشته
+      if (dayTasks.length === 0) {
+        // بدون تسک: خاکستری معمولی
+        cell.style.background = "#1f1f2e";
+      } else if (allDone) {
+        // همه تسک‌ها انجام شده: سبز
+        cell.style.background = "#1a3a2a";
+        cell.style.borderColor = "#2e7d32";
+        cell.classList.add("all-done");
+      } else if (hasUnfinished) {
+        // تسک انجام‌نشده دارد: نارنجی 🔶
+        cell.style.background = "#3d2a1a";
+        cell.style.borderColor = "#e67e22";
+        cell.classList.add("has-unfinished");
+      }
+    } else {
+      // روزهای آینده: خاکستری معمولی
+      cell.style.background = "#1f1f2e";
     }
     
-    // بررسی تسک‌ها با فیلترها برای نمایش نشان‌گر
-    let hasTaskWithFilter = tasks.some(t => {
-      if (t.date !== dateKey) return false;
-      if (userFilter !== "All" && t.user !== userFilter) return false;
-      if (dayFilter !== "All") {
-        const g = toGregorian(year, m+1, d);
-        const dayName = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"][new Date(g.year, g.month-1, g.day).getDay()];
-        if (dayFilter !== dayName) return false;
-      }
-      return true;
-    });
-    
-    if (hasTaskWithFilter) cell.classList.add("has-task");
-    if (today.year === year && today.month === m+1 && today.day === d) cell.classList.add("today");
-    
-    // ==============================================
-    // نمایش شماره روز + دایره سبز اگر انتخاب شده باشد
-    // ==============================================
+    // شماره روز
     const numSpan = document.createElement("span");
     numSpan.className = "day-number";
     numSpan.textContent = d;
     cell.appendChild(numSpan);
     
-    // اگر این روز همان روز انتخاب‌شده است، دایره سبز کنارش بگذار
+    // دایره سبز برای روز انتخاب‌شده
     if (selectedDate === dateKey) {
       const dot = document.createElement("span");
-      dot.style.cssText = `
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: #4caf50;
-        border-radius: 50%;
-        margin-right: 4px;
-        box-shadow: 0 0 8px #4caf50;
-        vertical-align: middle;
-      `;
+      dot.className = "selected-dot";
       cell.appendChild(dot);
     }
     
-    if (hasTaskWithFilter) {
-      const ind = document.createElement("span");
-      ind.className = "task-indicator";
-      ind.textContent = "📌";
-      cell.appendChild(ind);
-    }
-    
-    // کلیک روی روز: انتخاب تاریخ و نمایش تسک‌ها
+    // کلیک روی روز
     cell.addEventListener("click", () => {
       selectedDate = dateKey;
-      renderCalendar(); // برای به‌روزرسانی دایره سبز
+      renderCalendar();
       showDayTasks(dateKey);
     });
     
@@ -248,21 +260,29 @@ function showDayTasks(dateKey) {
   });
   
   if (filtered.length === 0) {
-    listDiv.innerHTML = `<p style="color:#aaa;">✨ هیچ تسکی برای این روز نیست</p>`;
+    listDiv.innerHTML = `<p style="color:#aaa; font-size:0.85rem;">✨ هیچ تسکی برای این روز نیست</p>`;
     return;
   }
   
   listDiv.innerHTML = "";
   filtered.forEach(task => {
     const card = document.createElement("div");
-    card.className = `task-card ${task.done ? "done" : ""}`;
+    const userClass = task.user === 'Saeed' ? 'user-saeed' : 'user-mohammadreza';
+    const badgeClass = task.user === 'Saeed' ? 'saeed' : 'mohammadreza';
+    card.className = `task-card ${userClass} ${task.done ? "done" : ""}`;
+    
     card.innerHTML = `
-      <b>${task.title}</b>
-      <small>${task.user} ${task.desc ? '| '+task.desc : ''}</small>
-      <div class="actions">
+      <div class="task-info">
+        <b>
+          <span class="user-badge ${badgeClass}">${task.user}</span>
+          ${task.title}
+        </b>
+        <small>${task.desc || ''}</small>
+      </div>
+      <div class="task-actions">
         <button class="btn-done" onclick="toggleDone(${task.id})">${task.done ? '✔ انجام شد' : '✓ انجام شد'}</button>
-        <button onclick="editTask(${task.id})">✎ ویرایش</button>
-        <button class="btn-del" onclick="deleteTask(${task.id})">✖ حذف</button>
+        <button onclick="editTask(${task.id})">✎</button>
+        <button class="btn-del" onclick="deleteTask(${task.id})">✖</button>
       </div>
     `;
     listDiv.appendChild(card);
