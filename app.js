@@ -67,7 +67,6 @@ async function loadTasks() {
     });
     const data = await res.json();
     if (data && data.record && Array.isArray(data.record)) {
-      // فیلتر کردن داده موقت اولیه برای اینکه لیست خالی بمونه
       tasks = data.record.filter(t => !t.temp);
     } else {
       tasks = [];
@@ -377,8 +376,9 @@ function renderTaskList(dateKey, listId, titleId) {
   });
 }
 
+// رفع باگ تقویم: استفاده از شناسه صحیح
 function showDayTasks(dateKey) {
-  renderTaskList(dateKey, 'dayTaskList', 'dayDetail h3');
+  renderTaskList(dateKey, 'dayTaskList', 'dayTitle');
 }
 
 // ============================
