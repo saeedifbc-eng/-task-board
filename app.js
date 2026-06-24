@@ -1,3 +1,10 @@
+// ==========================================================
+// تنظیمات دیتابیس JSONBin
+// ==========================================================
+const BIN_ID = "6a3c12b1da38895dfef890a0"; 
+const BIN_KEY = "$2a$10$X.Tg/856vciIsWVk/OEnjeW65O6V9yXhpcMPpUA6.MuHUuM/PSy0O"; 
+
+
 // ============================
 // داده‌ها و توابع پایه
 // ============================
@@ -51,7 +58,63 @@ function toDateKey(py, pm, pd) {
 }
 
 // ============================
-// انتخاب کاربر در فرم
+// ارتباط با سرور JSONBin
+// ============================
+async function loadTasks() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': BIN_KEY }
+    });
+    const data = await res.json();
+    if (data && data.record && Array.isArray(data.record)) {
+      // فیلتر کردن داده موقت اولیه برای اینکه لیست خالی بمونه
+      tasks = data.record.filter(t => !t.temp);
+    } else {
+      tasks = [];
+    }
+    refreshUI();
+  } catch (error) {
+    console.error("خطا در دریافت اطلاعات:", error);
+    refreshUI();
+  }
+}
+
+async function saveTasks() {
+  try {
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Master-Key': BIN_KEY
+      },
+      body: JSON.stringify(tasks)
+    });
+  } catch (error) {
+    console.error("خطا در ذخیره اطلاعات:", error);
+  }
+}
+
+// چک کردن مداوم برای همگام‌سازی لحظه‌ای (هر ۳ ثانیه)
+setInterval(() => {
+  loadTasks();
+}, 3000);
+
+// ============================
+// رفرش کردن ظاهر سایت
+// ============================
+function refreshUI() {
+  renderCalendar();
+  if (selectedDate) {
+    if (document.getElementById("todayView").style.display === "block") {
+      renderTaskList(selectedDate, 'todayTaskList', 'todayTitle');
+    } else {
+      showDayTasks(selectedDate);
+    }
+  }
+}
+
+// ============================
+// توابع فرم و فیلتر
 // ============================
 function selectUser(btn) {
   const buttons = document.querySelectorAll("#userToggle button");
@@ -60,9 +123,6 @@ function selectUser(btn) {
   selectedUser = btn.getAttribute("data-user");
 }
 
-// ============================
-// فیلتر کاربر
-// ============================
 function setFilter(btn) {
   const buttons = document.querySelectorAll("#filterBar button");
   buttons.forEach(b => b.classList.remove("selected"));
@@ -72,15 +132,9 @@ function setFilter(btn) {
   if (selectedDate) showDayTasks(selectedDate);
 }
 
-// ============================
-// توابع مرحله‌ای فرم
-// ============================
 function nextStep() {
   const title = document.getElementById("taskTitle").value.trim();
-  if (!title) {
-    alert("لطفاً عنوان تسک را وارد کنید");
-    return;
-  }
+  if (!title) { alert("لطفاً عنوان تسک را وارد کنید"); return; }
   document.getElementById("step1").classList.remove("active");
   document.getElementById("step2").classList.add("active");
   document.getElementById("taskDesc").focus();
@@ -93,31 +147,34 @@ function prevStep() {
 }
 
 // ============================
-// دکمه تسک‌های امروز
+// ناوبری
 // ============================
 function goToToday() {
   const today = getTodayPersian();
+  const todayKey = toDateKey(today.year, today.month, today.day);
+  selectedDate = todayKey;
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("todayView").style.display = "block";
+  document.getElementById("btnToday").style.display = "none";
+  document.getElementById("btnHome").style.display = "flex";
+  renderTaskList(todayKey, 'todayTaskList', 'todayTitle');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goHome() {
+  document.getElementById("todayView").style.display = "none";
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("btnToday").style.display = "flex";
+  document.getElementById("btnHome").style.display = "none";
+  const today = getTodayPersian();
   currentMonth = today.month - 1;
   document.getElementById("monthSelect").value = currentMonth;
-  selectedDate = toDateKey(today.year, today.month, today.day);
   renderCalendar();
-  showDayTasks(selectedDate);
-  document.querySelector('.calendar-wrapper').scrollIntoView({ behavior: 'smooth' });
+  if (selectedDate) showDayTasks(selectedDate);
 }
 
 // ============================
-// بارگذاری و ذخیره
-// ============================
-function loadTasks() {
-  const data = localStorage.getItem("tasks");
-  if (data) tasks = JSON.parse(data);
-}
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
-
-// ============================
-// تغییر ماه نمایش
+// تغییر ماه
 // ============================
 function changeMonth(delta) {
   currentMonth = (currentMonth + delta + 12) % 12;
@@ -128,18 +185,12 @@ function changeMonth(delta) {
 // ============================
 // افزودن تسک
 // ============================
-function addTask() {
+async function addTask() {
   const title = document.getElementById("taskTitle").value.trim();
   const desc = document.getElementById("taskDesc").value.trim();
   
-  if (!selectedDate) {
-    alert("لطفاً ابتدا یک روز را در تقویم انتخاب کنید");
-    return;
-  }
-  if (!title) { 
-    alert("لطفاً عنوان تسک را وارد کنید");
-    return; 
-  }
+  if (!selectedDate) { alert("لطفاً ابتدا یک روز را در تقویم انتخاب کنید"); return; }
+  if (!title) { alert("لطفاً عنوان تسک را وارد کنید"); return; }
   
   const [year, month, day] = selectedDate.split('-').map(Number);
   const dateKey = toDateKey(year, month, day);
@@ -152,8 +203,8 @@ function addTask() {
     date: dateKey,
     done: false
   });
-  saveTasks();
-  renderCalendar();
+  
+  await saveTasks();
   
   document.getElementById("taskTitle").value = "";
   document.getElementById("taskDesc").value = "";
@@ -161,11 +212,11 @@ function addTask() {
   document.getElementById("step1").classList.add("active");
   document.getElementById("taskTitle").focus();
   
-  showDayTasks(dateKey);
+  refreshUI();
 }
 
 // ============================
-// باز/بسته کردن توضیحات کارت
+// توضیحات کارت
 // ============================
 function toggleCard(cardEl, event) {
   event.stopPropagation();
@@ -178,7 +229,6 @@ function toggleCard(cardEl, event) {
 function renderCalendar() {
   const container = document.getElementById("calendarContainer");
   container.innerHTML = "";
-  
   const year = 1405;
   const m = currentMonth;
   
@@ -216,7 +266,6 @@ function renderCalendar() {
   for (let d = 1; d <= monthDays[m]; d++) {
     const cell = document.createElement("div");
     cell.className = "day-cell";
-    
     const dateKey = toDateKey(year, m+1, d);
     
     const gDate = toGregorian(year, m+1, d);
@@ -225,11 +274,9 @@ function renderCalendar() {
     const isPast = cellTimestamp < todayTimestamp && !(today.year === year && today.month === m+1 && today.day === d);
     const isToday = (today.year === year && today.month === m+1 && today.day === d);
     
-    // اعمال فیلتر کاربر روی وضعیت روزها
     let dayTasks = tasks.filter(t => t.date === dateKey);
-    if (filterUser !== "All") {
-      dayTasks = dayTasks.filter(t => t.user === filterUser);
-    }
+    if (filterUser !== "All") dayTasks = dayTasks.filter(t => t.user === filterUser);
+    
     const hasUnfinished = dayTasks.some(t => t.done === false);
     const allDone = dayTasks.length > 0 && dayTasks.every(t => t.done === true);
     
@@ -272,18 +319,16 @@ function renderCalendar() {
     
     daysGrid.appendChild(cell);
   }
-  
   monthDiv.appendChild(daysGrid);
   container.appendChild(monthDiv);
 }
 
 // ============================
-// نمایش تسک‌های یک روز
+// ساخت کارت‌ها
 // ============================
-function showDayTasks(dateKey) {
-  const listDiv = document.getElementById("dayTaskList");
-  const titleEl = document.querySelector("#dayDetail h3");
-  
+function renderTaskList(dateKey, listId, titleId) {
+  const listDiv = document.getElementById(listId);
+  const titleEl = document.getElementById(titleId);
   const [y, m, d] = dateKey.split('-').map(Number);
   titleEl.textContent = `تسک‌های ${formatPersianDate(y, m, d)}`;
   
@@ -317,9 +362,7 @@ function showDayTasks(dateKey) {
       <span class="expand-hint" onclick="toggleCard(this.parentElement, event)">برای دیدن توضیحات کامل کلیک کنید</span>
     `;
     
-    if (hasDesc) {
-      html += `<div class="full-desc">${task.desc}</div>`;
-    }
+    if (hasDesc) html += `<div class="full-desc">${task.desc}</div>`;
     
     html += `
       <div class="task-actions">
@@ -334,34 +377,35 @@ function showDayTasks(dateKey) {
   });
 }
 
+function showDayTasks(dateKey) {
+  renderTaskList(dateKey, 'dayTaskList', 'dayDetail h3');
+}
+
 // ============================
 // عملیات روی تسک‌ها
 // ============================
-function toggleDone(id) {
+async function toggleDone(id) {
   tasks = tasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
-  saveTasks();
-  renderCalendar();
-  if (selectedDate) showDayTasks(selectedDate);
+  await saveTasks();
+  refreshUI();
 }
 
-function editTask(id) {
+async function editTask(id) {
   const task = tasks.find(t => t.id === id);
   if (!task) return;
   const newTitle = prompt("عنوان جدید:", task.title);
   if (newTitle !== null) task.title = newTitle.trim() || task.title;
   const newDesc = prompt("توضیحات جدید:", task.desc);
   if (newDesc !== null) task.desc = newDesc.trim();
-  saveTasks();
-  renderCalendar();
-  if (selectedDate) showDayTasks(selectedDate);
+  await saveTasks();
+  refreshUI();
 }
 
-function deleteTask(id) {
+async function deleteTask(id) {
   if (!confirm("آیا این تسک حذف شود؟")) return;
   tasks = tasks.filter(t => t.id !== id);
-  saveTasks();
-  renderCalendar();
-  if (selectedDate) showDayTasks(selectedDate);
+  await saveTasks();
+  refreshUI();
 }
 
 // ============================
@@ -372,5 +416,3 @@ const today = getTodayPersian();
 currentMonth = today.month - 1;
 document.getElementById("monthSelect").value = currentMonth;
 selectedDate = toDateKey(today.year, today.month, today.day);
-renderCalendar();
-showDayTasks(selectedDate);
