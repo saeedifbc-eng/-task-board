@@ -81,10 +81,12 @@ function checkSession() {
 }
 
 function doLogin() {
-  const username = document.getElementById('loginUser').value.trim();
+  const username = document.getElementById('loginUser').value.trim().toLowerCase();
   const password = document.getElementById('loginPass').value;
   if (USERS[username] && USERS[username].pass === password) {
-    localStorage.setItem('appUser', username);
+    try {
+      localStorage.setItem('appUser', username);
+    } catch (e) {}
     loggedInUser = USERS[username].name;
     showApp();
   } else {
@@ -161,7 +163,6 @@ function checkNotifications() {
   const today = getTodayPersian();
   const todayKey = toDateKey(today.year, today.month, today.day);
   
-  // پیام‌های چت جدید از طرف دیگه
   const lastMsg = chatMessages[chatMessages.length - 1];
   if (lastMsg && lastMsg.user !== loggedInUser) {
     const userName = lastMsg.user === 'Saeed' ? 'سعید' : 'محمدرضا';
@@ -170,7 +171,6 @@ function checkNotifications() {
     }
   }
 
-  // تسک‌های فوری امروز انجام نشده
   const urgentToday = tasks.filter(t => t.date === todayKey && t.urgent && !t.done);
   if (urgentToday.length > 0) {
     if (Notification.permission === "granted") {
@@ -179,11 +179,9 @@ function checkNotifications() {
   }
 }
 
-// درخواست دسترسی اعلان
 if ("Notification" in window && Notification.permission === "default") {
   Notification.requestPermission();
 }
-// چک اعلان هر ۱۰ ثانیه
 setInterval(checkNotifications, 10000);
 
 // ============================
@@ -226,6 +224,7 @@ function setFilter(btn) {
 function toggleUrgent() {
   isUrgent = !isUrgent;
   document.getElementById('urgentToggle').classList.toggle('active', isUrgent);
+  document.getElementById('urgentCheck').textContent = isUrgent ? '✓' : '';
 }
 
 function nextStep() {
@@ -342,6 +341,7 @@ async function addTask() {
   
   isUrgent = false;
   document.getElementById('urgentToggle').classList.remove('active');
+  document.getElementById('urgentCheck').textContent = '';
   
   await saveTasks();
   
@@ -563,12 +563,44 @@ function renderChatMessages() {
     return;
   }
   container.innerHTML = "";
+  
+  const today = getTodayPersian();
+  const todayKey = toDateKey(today.year, today.month, today.day);
+  
+  // محاسبه تاریخ دیروز
+  const yG = new Date();
+  yG.setDate(yG.getDate() - 1);
+  const yP = toPersianDate(yG.getFullYear(), yG.getMonth() + 1, yG.getDate());
+  const yesterdayKey = toDateKey(yP.year, yP.month, yP.day);
+
+  let lastDate = null;
+
   chatMessages.forEach(msg => {
+    const msgDate = msg.date || todayKey; // برای پیام‌های قدیمی که تاریخ ندارند
+    
+    // اگر تاریخ پیام عوض شد، جداکننده تاریخ را اضافه کن
+    if (msgDate !== lastDate) {
+      const dateDiv = document.createElement("div");
+      dateDiv.className = "chat-date-divider";
+      
+      if (msgDate === todayKey) {
+        dateDiv.textContent = "امروز";
+      } else if (msgDate === yesterdayKey) {
+        dateDiv.textContent = "دیروز";
+      } else {
+        const [y, m, d] = msgDate.split('-').map(Number);
+        dateDiv.textContent = formatPersianDate(y, m, d);
+      }
+      
+      container.appendChild(dateDiv);
+      lastDate = msgDate;
+    }
+
     const div = document.createElement("div");
     const userClass = msg.user === 'Saeed' ? 'saeed' : 'mohammadreza';
     const userName = msg.user === 'Saeed' ? 'سعید' : 'محمدرضا';
     div.className = `chat-msg ${userClass}`;
-    div.innerHTML = `<span class="chat-msg-user">${userName}</span>${msg.text}`;
+    div.innerHTML = `<span class="chat-msg-user">${userName} - ${msg.time || ''}</span>${msg.text}`;
     container.appendChild(div);
   });
   container.scrollTop = container.scrollHeight;
@@ -579,11 +611,20 @@ async function sendChat() {
   const text = input.value.trim();
   if (!text) return;
   
+  const now = new Date();
+  const pDate = getTodayPersian();
+  const todayKey = toDateKey(pDate.year, pDate.month, pDate.day);
+  
+  // تبدیل ساعت به فارسی و ۲۴ ساعته
+  const timeStr = now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit', hour12: false});
+  
   chatMessages.push({
     id: Date.now(),
     type: 'chat',
     user: loggedInUser,
-    text: text
+    text: text,
+    time: timeStr,
+    date: todayKey
   });
   
   input.value = "";
@@ -613,13 +654,14 @@ function getWeekRange() {
 
 function renderDashboard() {
   const container = document.getElementById("dashStatsContainer");
-  const weekDates = getWeekRange();
+  document.getElementById("dashDetailContainer").style.display = "none";
   
+  const weekDates = getWeekRange();
   const weekTasks = tasks.filter(t => weekDates.includes(t.date));
   
   const sTasks = weekTasks.filter(t => t.user === 'Saeed');
   const mTasks = weekTasks.filter(t => t.user === 'Mohammadreza');
-  const urgentTasks = weekTasks.filter(t => t.urgent && !t.done);
+  const unfinishedTasks = weekTasks.filter(t => !t.done);
 
   const sDone = sTasks.filter(t => t.done).length;
   const mDone = mTasks.filter(t => t.done).length;
@@ -634,19 +676,68 @@ function renderDashboard() {
       <span>انجام شده</span>
       <span class="stat-val" style="color:#4caf50">${totalDone}</span>
     </div>
-    <div class="stat-row">
-      <span>تسک‌های فوری انجام نشده</span>
-      <span class="stat-val stat-urgent">${urgentTasks.length}</span>
+    <div class="stat-row stat-clickable" onclick="showDashDetail('unfinished')">
+      <span>تسک‌های انجام نشده</span>
+      <span class="stat-val stat-urgent">${unfinishedTasks.length}</span>
     </div>
-    <div class="stat-row">
+    <div class="stat-row stat-clickable" onclick="showDashDetail('Saeed')">
       <span>تسک‌های سعید (انجام شده / کل)</span>
       <span class="stat-val stat-saeed">${sDone} / ${sTasks.length}</span>
     </div>
-    <div class="stat-row">
+    <div class="stat-row stat-clickable" onclick="showDashDetail('Mohammadreza')">
       <span>تسک‌های محمدرضا (انجام شده / کل)</span>
       <span class="stat-val stat-mohammadreza">${mDone} / ${mTasks.length}</span>
     </div>
   `;
+}
+
+function showDashDetail(type) {
+  const container = document.getElementById("dashDetailContainer");
+  const titleEl = document.getElementById("dashDetailTitle");
+  const listEl = document.getElementById("dashDetailList");
+  
+  if (container.style.display === "block" && container.getAttribute('data-type') === type) {
+    container.style.display = "none";
+    return;
+  }
+
+  const weekDates = getWeekRange();
+  let filtered = tasks.filter(t => weekDates.includes(t.date));
+
+  if (type === 'unfinished') {
+    filtered = filtered.filter(t => !t.done);
+    titleEl.textContent = "لیست تسک‌های انجام نشده این هفته";
+  } else {
+    filtered = filtered.filter(t => t.user === type);
+    const name = type === 'Saeed' ? 'سعید' : 'محمدرضا';
+    titleEl.textContent = `لیست تسک‌های ${name} این هفته`;
+  }
+
+  container.setAttribute('data-type', type);
+  
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<p style="color:#666; font-size:0.85rem;">تسکی یافت نشد</p>';
+  } else {
+    listEl.innerHTML = "";
+    filtered.forEach(task => {
+      const card = document.createElement("div");
+      const userClass = task.user === 'Saeed' ? 'user-saeed' : 'user-mohammadreza';
+      card.className = `task-card ${userClass} ${task.done ? "done" : ""}`;
+      card.style.cursor = "default";
+      
+      let html = `
+        ${task.urgent ? '<span class="urgent-badge">فوری</span>' : ''}
+        <div class="task-info">
+          <b>${task.title}</b>
+          <small>${task.desc || ''}</small>
+        </div>
+      `;
+      card.innerHTML = html;
+      listEl.appendChild(card);
+    });
+  }
+  
+  container.style.display = "block";
 }
 
 // ============================
