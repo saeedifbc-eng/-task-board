@@ -27,6 +27,63 @@
       padding-top: 5px;
     }
     
+    /* ===== لاگین ===== */
+    .login-view {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 90vh;
+    }
+    .login-box {
+      background: #161620;
+      padding: 30px;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .login-box h2 {
+      text-align: center;
+      margin: 0;
+      font-weight: normal;
+      color: #fff;
+    }
+    .login-box input {
+      background: #252535;
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      color: white;
+      outline: none;
+      font-size: 0.95rem;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      width: 100%;
+    }
+    .login-box button {
+      background: linear-gradient(135deg, #4c6fff, #6a3de8);
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      transition: 0.2s;
+    }
+    .login-box button:active { transform: scale(0.95); }
+    .login-error {
+      color: #ff5555;
+      font-size: 0.8rem;
+      text-align: center;
+      display: none;
+      margin: 0;
+    }
+
+    /* ===== هدر ===== */
     .header-sticky {
       position: sticky;
       top: 0;
@@ -70,13 +127,46 @@
       min-width: 100px;
       justify-content: center;
     }
-    .header-sticky .btn-today:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(76, 111, 255, 0.5);
+    .header-sticky .btn-today:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(76, 111, 255, 0.5); }
+    .header-sticky .btn-today:active { transform: scale(0.95); }
+    .header-sticky .btn-chat {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      border: none;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+      white-space: nowrap;
     }
-    .header-sticky .btn-today:active {
-      transform: scale(0.95);
+    .header-sticky .btn-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(46, 125, 50, 0.5); }
+    .header-sticky .btn-chat:active { transform: scale(0.95); }
+    .header-sticky .btn-dash {
+      background: linear-gradient(135deg, #e67e22, #d35400);
+      border: none;
+      padding: 8px 20px;
+      border-radius: 30px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+      white-space: nowrap;
     }
+    .header-sticky .btn-dash:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(230, 126, 34, 0.5); }
+    .header-sticky .btn-dash:active { transform: scale(0.95); }
     .header-sticky .btn-home {
       background: linear-gradient(135deg, #444, #333);
       border: none;
@@ -94,16 +184,23 @@
       box-shadow: 0 4px 15px rgba(100, 100, 100, 0.2);
       white-space: nowrap;
     }
-    .header-sticky .btn-home:active {
-      transform: scale(0.95);
+    .header-sticky .btn-home:active { transform: scale(0.95); }
+    .header-sticky .btn-logout {
+      background: linear-gradient(135deg, #8b2d2d, #6b1f1f);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 30px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      font-size: 0.75rem;
+      white-space: nowrap;
     }
+    .header-sticky .btn-logout:active { transform: scale(0.95); }
     
-    .year-badge {
-      text-align: center;
-      color: #4c6fff;
-      font-size: 0.9rem;
-      margin: 6px 0 12px 0;
-    }
+    .year-badge { text-align: center; color: #4c6fff; font-size: 0.9rem; margin: 0 0 8px 0; }
 
     .task-form {
       background: #1a1a24;
@@ -111,19 +208,9 @@
       border-radius: 20px;
       margin-bottom: 16px;
     }
-    .task-form .step {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .task-form .step.active {
-      display: flex;
-    }
-    .task-form .step-title {
-      color: #aaa;
-      font-size: 0.75rem;
-      margin-bottom: 2px;
-    }
+    .task-form .step { display: none; flex-direction: column; gap: 10px; }
+    .task-form .step.active { display: flex; }
+    .task-form .step-title { color: #aaa; font-size: 0.75rem; margin-bottom: 2px; }
     .task-form input, .task-form select, .task-form textarea {
       background: #252535;
       border: none;
@@ -137,16 +224,8 @@
       -webkit-appearance: none;
       appearance: none;
     }
-    .task-form textarea {
-      resize: vertical;
-      height: 80px;
-      min-height: 60px;
-    }
-    .task-form .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
+    .task-form textarea { resize: vertical; height: 80px; min-height: 60px; }
+    .task-form .form-actions { display: flex; gap: 10px; margin-top: 6px; }
     .task-form .form-actions button {
       background: #4c6fff;
       border: none;
@@ -160,24 +239,12 @@
       font-size: 1rem;
       flex: 1;
     }
-    .task-form .form-actions button:active {
-      transform: scale(0.95);
-    }
-    .task-form .form-actions button:hover {
-      background: #3a56d4;
-    }
-    .task-form .form-actions button.secondary {
-      background: #333;
-    }
-    .task-form .form-actions button.secondary:hover {
-      background: #444;
-    }
+    .task-form .form-actions button:active { transform: scale(0.95); }
+    .task-form .form-actions button:hover { background: #3a56d4; }
+    .task-form .form-actions button.secondary { background: #333; }
+    .task-form .form-actions button.secondary:hover { background: #444; }
 
-    .user-toggle {
-      display: flex;
-      gap: 10px;
-      direction: rtl;
-    }
+    .user-toggle { display: flex; gap: 10px; direction: rtl; }
     .user-toggle button {
       flex: 1;
       padding: 14px 10px;
@@ -195,17 +262,8 @@
       justify-content: center;
       gap: 8px;
     }
-    .user-toggle button:active {
-      transform: scale(0.95);
-    }
-    .user-toggle .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid #555;
-      transition: 0.2s;
-      flex-shrink: 0;
-    }
+    .user-toggle button:active { transform: scale(0.95); }
+    .user-toggle .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #555; transition: 0.2s; flex-shrink: 0; }
     .user-toggle button[data-user="Saeed"] .dot { background: transparent; border-color: #4c6fff; }
     .user-toggle button[data-user="Mohammadreza"] .dot { background: transparent; border-color: #9c27b0; }
     .user-toggle button.selected[data-user="Saeed"] { border-color: #4c6fff; background: #4c6fff1a; color: #4c6fff; box-shadow: 0 0 20px #4c6fff22; }
@@ -213,12 +271,34 @@
     .user-toggle button.selected[data-user="Mohammadreza"] { border-color: #9c27b0; background: #9c27b01a; color: #9c27b0; box-shadow: 0 0 20px #9c27b022; }
     .user-toggle button.selected[data-user="Mohammadreza"] .dot { background: #9c27b0; box-shadow: 0 0 8px #9c27b088; }
 
-    .filter-bar {
+    /* تگ فوری */
+    .urgent-toggle {
       display: flex;
-      gap: 8px;
-      margin: 10px 0;
-      justify-content: center;
+      align-items: center;
+      justify-content: space-between;
+      background: #252535;
+      padding: 12px 16px;
+      border-radius: 16px;
+      color: #ccc;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
     }
+    .urgent-toggle.active { background: #e67e221a; color: #e67e22; border: 1px solid #e67e22; }
+    .urgent-toggle .check-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      transition: 0.2s;
+    }
+    .urgent-toggle.active .check-box { background: #e67e22; border-color: #e67e22; color: #fff; }
+
+    .filter-bar { display: flex; gap: 8px; margin: 10px 0; justify-content: center; }
     .filter-bar button {
       padding: 8px 20px;
       border-radius: 30px;
@@ -236,13 +316,7 @@
     .filter-bar button[data-filter="Saeed"].selected { border-color: #4c6fff; background: #4c6fff1a; color: #4c6fff; }
     .filter-bar button[data-filter="Mohammadreza"].selected { border-color: #9c27b0; background: #9c27b01a; color: #9c27b0; box-shadow: 0 0 15px #9c27b022; }
 
-    .month-selector {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
+    .month-selector { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 14px; }
     .month-selector select {
       background: #1f1f2e;
       color: white;
@@ -274,40 +348,16 @@
     .month-selector button:active { transform: scale(0.9); }
     .month-selector button:hover { background: #555; }
 
-    .calendar-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    .calendar-wrapper { display: flex; flex-direction: column; gap: 14px; }
     .month-grid {
       background: #161620;
       border-radius: 20px;
       padding: 12px 8px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.6);
     }
-    .month-title {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #fff;
-      text-align: center;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
-    .weekdays {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #aaa;
-      text-align: center;
-      font-size: 0.7rem;
-    }
-    .days-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
-    }
+    .month-title { font-size: 1.3rem; font-weight: bold; color: #fff; text-align: center; margin-bottom: 10px; letter-spacing: 1px; }
+    .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 6px; font-weight: bold; color: #aaa; text-align: center; font-size: 0.7rem; }
+    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
     .day-cell {
       border-radius: 12px;
       padding: 8px 2px;
@@ -334,18 +384,8 @@
     .empty-cell { background: transparent !important; pointer-events: none; border-color: transparent !important; }
     .day-cell .selected-dot { display: inline-block; width: 8px; height: 8px; background: #4caf50; border-radius: 50%; box-shadow: 0 0 6px #4caf50; margin-top: 2px; }
 
-    .day-detail {
-      background: #161620;
-      border-radius: 20px;
-      padding: 14px;
-      margin-top: 6px;
-    }
-    .day-detail h3 {
-      color: #fff;
-      margin: 0 0 10px 0;
-      font-weight: normal;
-      font-size: 0.95rem;
-    }
+    .day-detail { background: #161620; border-radius: 20px; padding: 14px; margin-top: 6px; }
+    .day-detail h3 { color: #fff; margin: 0 0 10px 0; font-weight: normal; font-size: 0.95rem; }
     .task-card {
       background: #222235;
       border-radius: 14px;
@@ -357,6 +397,7 @@
       gap: 6px;
       cursor: pointer;
       transition: 0.2s;
+      position: relative;
     }
     .task-card:active { transform: scale(0.98); }
     .task-card .task-info { flex: 1; }
@@ -377,6 +418,13 @@
     .task-card .user-badge { display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 0.6rem; font-weight: bold; margin-left: 4px; }
     .user-badge.saeed { background: #4c6fff33; color: #4c6fff; }
     .user-badge.mohammadreza { background: #9c27b033; color: #9c27b0; }
+    
+    .task-card .urgent-badge { 
+      position: absolute; top: 10px; left: 12px; 
+      background: #e67e2233; color: #e67e22; 
+      padding: 2px 8px; border-radius: 20px; 
+      font-size: 0.6rem; font-weight: bold; 
+    }
 
     .task-card .full-desc { display: none; background: #1a1a2a; border-radius: 10px; padding: 10px 12px; color: #ccc; font-size: 0.8rem; line-height: 1.8; margin-top: 4px; border-top: 1px solid #333; word-break: break-word; white-space: pre-wrap; }
     .task-card.expanded .full-desc { display: block; }
@@ -385,10 +433,97 @@
     .task-card.has-desc .expand-hint { display: block; }
     .task-card.expanded .expand-hint { display: none; }
 
+    /* ===== چت ===== */
+    .chat-view { display: none; flex-direction: column; gap: 10px; }
+    .chat-messages {
+      min-height: 50vh;
+      max-height: 65vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: #161620;
+      border-radius: 20px;
+    }
+    .chat-msg {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .chat-msg .chat-msg-user { font-size: 0.65rem; font-weight: bold; margin-bottom: 4px; display: block; }
+    .chat-msg.saeed { align-self: flex-end; background: #4c6fff22; border-bottom-left-radius: 4px; }
+    .chat-msg.saeed .chat-msg-user { color: #4c6fff; }
+    .chat-msg.mohammadreza { align-self: flex-start; background: #9c27b022; border-bottom-right-radius: 4px; }
+    .chat-msg.mohammadreza .chat-msg-user { color: #9c27b0; }
+    .chat-input-bar { display: flex; gap: 8px; }
+    .chat-input-bar input {
+      flex: 1;
+      background: #252535;
+      border: none;
+      padding: 14px 16px;
+      border-radius: 16px;
+      color: white;
+      outline: none;
+      font-size: 0.9rem;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+    }
+    .chat-input-bar button {
+      background: #2e7d32;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 16px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+      font-size: 0.9rem;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .chat-input-bar button:active { transform: scale(0.95); }
+    .chat-input-bar button:hover { background: #1e5a22; }
+
+    /* ===== داشبورد هفتگی ===== */
+    .dash-view { display: none; flex-direction: column; gap: 14px; }
+    .dash-card {
+      background: #161620;
+      padding: 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .dash-card h3 {
+      color: #fff;
+      margin: 0 0 14px 0;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #222;
+      padding-bottom: 8px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a2a;
+      font-size: 0.85rem;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-val { font-weight: bold; }
+    .stat-saeed { color: #4c6fff; }
+    .stat-mohammadreza { color: #9c27b0; }
+    .stat-urgent { color: #e67e22; }
+
     @media (max-width: 480px) {
       body { padding: 6px; }
       .header-sticky h1 { font-size: 0.9rem; }
       .header-sticky .btn-today { font-size: 0.75rem; padding: 7px 16px; min-width: 85px; }
+      .header-sticky .btn-chat { font-size: 0.75rem; padding: 7px 14px; }
+      .header-sticky .btn-dash { font-size: 0.75rem; padding: 7px 14px; }
+      .header-sticky .btn-logout { font-size: 0.65rem; padding: 7px 12px; }
       .header-sticky .btn-home { font-size: 0.75rem; padding: 7px 14px; }
       .day-cell { min-height: 44px; padding: 6px 1px; }
       .day-cell .day-number { font-size: 0.75rem; }
@@ -406,6 +541,9 @@
       .task-form .step-title { font-size: 0.65rem; }
       .user-toggle button { padding: 12px 8px; font-size: 0.85rem; }
       .filter-bar button { padding: 6px 14px; font-size: 0.7rem; }
+      .chat-msg { font-size: 0.8rem; padding: 8px 12px; }
+      .chat-input-bar input { padding: 12px 14px; font-size: 0.8rem; }
+      .chat-input-bar button { padding: 12px 16px; font-size: 0.8rem; }
     }
 
     @media (max-width: 380px) {
@@ -420,83 +558,124 @@
 <body>
 <div class="container">
 
-  <div class="header-sticky">
-    <h1>برنامه کارهای شرکت</h1>
-    <div class="header-buttons">
-      <button class="btn-home" id="btnHome" onclick="goHome()">🏠 خانه</button>
-      <button class="btn-today" id="btnToday" onclick="goToToday()">امروز</button>
+  <!-- لاگین -->
+  <div id="loginView" class="login-view">
+    <div class="login-box">
+      <h2>ورود به سیستم</h2>
+      <input id="loginUser" type="text" placeholder="نام کاربری">
+      <input id="loginPass" type="password" placeholder="رمز عبور" onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="doLogin()">ورود</button>
+      <p id="loginError" class="login-error">نام کاربری یا رمز عبور اشتباه است</p>
     </div>
   </div>
 
-  <div class="year-badge">سال ۱۴۰۵ شمسی</div>
-
-  <div class="task-form" id="taskForm">
-    <div class="step active" id="step1">
-      <div class="step-title">مرحله ۱ از ۲ - عنوان تسک</div>
-      <input id="taskTitle" placeholder="عنوان تسک را وارد کنید" autofocus>
-      <div class="form-actions">
-        <button onclick="nextStep()">بعدی</button>
+  <!-- اپلیکیشن اصلی -->
+  <div id="appView" style="display: none;">
+    <div class="header-sticky">
+      <h1>برنامه کارهای شرکت</h1>
+      <div class="header-buttons">
+        <button class="btn-home" id="btnHome" onclick="goHome()">خانه</button>
+        <button class="btn-logout" id="btnLogout" onclick="doLogout()">خروج</button>
+        <button class="btn-dash" id="btnDash" onclick="openDash()">داشبورد</button>
+        <button class="btn-chat" id="btnChat" onclick="openChat()">چت</button>
+        <button class="btn-today" id="btnToday" onclick="goToToday()">امروز</button>
       </div>
     </div>
-    <div class="step" id="step2">
-      <div class="step-title">مرحله ۲ از ۲ - توضیحات و انتخاب کاربر</div>
-      <textarea id="taskDesc" placeholder="توضیحات (اختیاری)"></textarea>
-      <div class="user-toggle" id="userToggle">
-        <button type="button" data-user="Saeed" class="selected" onclick="selectUser(this)">
-          <span class="dot"></span>
-          سعید
-        </button>
-        <button type="button" data-user="Mohammadreza" onclick="selectUser(this)">
-          <span class="dot"></span>
-          محدرضا
-        </button>
+
+    <div class="task-form" id="taskForm">
+      <div class="step active" id="step1">
+        <div class="step-title">مرحله ۱ از ۳ - عنوان تسک</div>
+        <input id="taskTitle" placeholder="عنوان تسک را وارد کنید" autofocus>
+        <div class="form-actions">
+          <button onclick="nextStep()">بعدی</button>
+        </div>
       </div>
-      <div class="form-actions">
-        <button class="secondary" onclick="prevStep()">قبلی</button>
-        <button onclick="addTask()">+ افزودن</button>
+      <div class="step" id="step2">
+        <div class="step-title">مرحله ۲ از ۳ - توضیحات و اولویت</div>
+        <textarea id="taskDesc" placeholder="توضیحات (اختیاری)"></textarea>
+        <div class="urgent-toggle" id="urgentToggle" onclick="toggleUrgent()">
+          <span>فوری</span>
+          <div class="check-box" id="urgentCheck">✓</div>
+        </div>
+        <div class="form-actions">
+          <button class="secondary" onclick="prevStep()">قبلی</button>
+          <button onclick="nextStep2()">بعدی</button>
+        </div>
       </div>
-    </div>
-  </div>
-
-  <div id="mainView">
-    <div class="filter-bar" id="filterBar">
-      <button data-filter="All" class="selected" onclick="setFilter(this)">همه</button>
-      <button data-filter="Saeed" onclick="setFilter(this)">سعید</button>
-      <button data-filter="Mohammadreza" onclick="setFilter(this)">محمدرضا</button>
-    </div>
-
-    <div class="month-selector">
-      <button onclick="changeMonth(-1)">◀</button>
-      <select id="monthSelect" onchange="renderCalendar()">
-        <option value="0">فروردین</option>
-        <option value="1">اردیبهشت</option>
-        <option value="2">خرداد</option>
-        <option value="3">تیر</option>
-        <option value="4">مرداد</option>
-        <option value="5">شهریور</option>
-        <option value="6">مهر</option>
-        <option value="7">آبان</option>
-        <option value="8">آذر</option>
-        <option value="9">دی</option>
-        <option value="10">بهمن</option>
-        <option value="11">اسفند</option>
-      </select>
-      <button onclick="changeMonth(1)">▶</button>
-    </div>
-
-    <div class="calendar-wrapper">
-      <div id="calendarContainer"></div>
-      <div id="dayDetail" class="day-detail">
-        <h3 id="dayTitle">تسک‌های امروز</h3>
-        <div id="dayTaskList">روزی را انتخاب کنید</div>
+      <div class="step" id="step3">
+        <div class="step-title">مرحله ۳ از ۳ - انتخاب کاربر</div>
+        <div class="user-toggle" id="userToggle">
+          <button type="button" data-user="Saeed" class="selected" onclick="selectUser(this)">
+            <span class="dot"></span>
+            سعید
+          </button>
+          <button type="button" data-user="Mohammadreza" onclick="selectUser(this)">
+            <span class="dot"></span>
+            محمدرضا
+          </button>
+        </div>
+        <div class="form-actions">
+          <button class="secondary" onclick="prevStep2()">قبلی</button>
+          <button onclick="addTask()">+ افزودن</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="todayView" style="display: none;">
-    <div class="day-detail">
-      <h3 id="todayTitle">تسک‌های امروز</h3>
-      <div id="todayTaskList"></div>
+    <div id="mainView">
+      <div class="filter-bar" id="filterBar">
+        <button data-filter="All" class="selected" onclick="setFilter(this)">همه</button>
+        <button data-filter="Saeed" onclick="setFilter(this)">سعید</button>
+        <button data-filter="Mohammadreza" onclick="setFilter(this)">محمدرضا</button>
+      </div>
+
+      <div class="month-selector">
+        <button onclick="changeMonth(1)">▶</button>
+        <select id="monthSelect" onchange="currentMonth=parseInt(this.value); renderCalendar()">
+          <option value="0">فروردین</option>
+          <option value="1">اردیبهشت</option>
+          <option value="2">خرداد</option>
+          <option value="3">تیر</option>
+          <option value="4">مرداد</option>
+          <option value="5">شهریور</option>
+          <option value="6">مهر</option>
+          <option value="7">آبان</option>
+          <option value="8">آذر</option>
+          <option value="9">دی</option>
+          <option value="10">بهمن</option>
+          <option value="11">اسفند</option>
+        </select>
+        <button onclick="changeMonth(-1)">◀</button>
+      </div>
+
+      <div class="calendar-wrapper">
+        <div id="calendarContainer"></div>
+        <div id="dayDetail" class="day-detail">
+          <h3 id="dayTitle">تسک‌های امروز</h3>
+          <div id="dayTaskList">روزی را انتخاب کنید</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="todayView" style="display: none;">
+      <div class="day-detail">
+        <h3 id="todayTitle">تسک‌های امروز</h3>
+        <div id="todayTaskList"></div>
+      </div>
+    </div>
+
+    <div id="chatView" class="chat-view">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-bar">
+        <input id="chatInput" placeholder="پیام خود را بنویسید..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()">ارسال</button>
+      </div>
+    </div>
+
+    <div id="dashView" class="dash-view">
+      <div class="dash-card">
+        <h3>آمار هفته جاری (تسک‌های این هفته)</h3>
+        <div id="dashStatsContainer"></div>
+      </div>
     </div>
   </div>
 
