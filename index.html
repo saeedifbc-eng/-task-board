@@ -130,7 +130,7 @@
     .header-sticky .btn-today:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(76, 111, 255, 0.5); }
     .header-sticky .btn-today:active { transform: scale(0.95); }
     .header-sticky .btn-chat {
-      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      background: linear-gradient(135deg, #6a3de8, #9b59b6);
       border: none;
       padding: 8px 20px;
       border-radius: 30px;
@@ -143,17 +143,17 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+      box-shadow: 0 4px 15px rgba(106, 61, 232, 0.3);
       white-space: nowrap;
     }
-    .header-sticky .btn-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(46, 125, 50, 0.5); }
+    .header-sticky .btn-chat:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(106, 61, 232, 0.5); }
     .header-sticky .btn-chat:active { transform: scale(0.95); }
     .header-sticky .btn-dash {
-      background: linear-gradient(135deg, #e67e22, #d35400);
-      border: none;
+      background: #0f0f14;
+      border: 1px solid #333;
       padding: 8px 20px;
       border-radius: 30px;
-      color: white;
+      color: #ccc;
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
@@ -162,10 +162,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
       white-space: nowrap;
     }
-    .header-sticky .btn-dash:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(230, 126, 34, 0.5); }
     .header-sticky .btn-dash:active { transform: scale(0.95); }
     .header-sticky .btn-home {
       background: linear-gradient(135deg, #444, #333);
@@ -186,11 +184,11 @@
     }
     .header-sticky .btn-home:active { transform: scale(0.95); }
     .header-sticky .btn-logout {
-      background: linear-gradient(135deg, #8b2d2d, #6b1f1f);
-      border: none;
+      background: #0f0f14;
+      border: 1px solid #333;
       padding: 8px 16px;
       border-radius: 30px;
-      color: white;
+      color: #ccc;
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
@@ -283,8 +281,10 @@
       font-size: 0.9rem;
       cursor: pointer;
       user-select: none;
+      border: 1px solid transparent;
+      transition: 0.2s;
     }
-    .urgent-toggle.active { background: #e67e221a; color: #e67e22; border: 1px solid #e67e22; }
+    .urgent-toggle.active { background: #e67e221a; color: #e67e22; border-color: #e67e22; }
     .urgent-toggle .check-box {
       width: 22px;
       height: 22px;
@@ -295,6 +295,7 @@
       justify-content: center;
       font-size: 0.8rem;
       transition: 0.2s;
+      color: transparent;
     }
     .urgent-toggle.active .check-box { background: #e67e22; border-color: #e67e22; color: #fff; }
 
@@ -446,6 +447,17 @@
       background: #161620;
       border-radius: 20px;
     }
+    .chat-date-divider {
+      text-align: center;
+      color: #888;
+      font-size: 0.7rem;
+      margin: 10px 0 5px 0;
+      background: #25253588;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      align-self: center;
+    }
     .chat-msg {
       max-width: 75%;
       padding: 10px 14px;
@@ -455,10 +467,10 @@
       word-break: break-word;
       white-space: pre-wrap;
     }
-    .chat-msg .chat-msg-user { font-size: 0.65rem; font-weight: bold; margin-bottom: 4px; display: block; }
-    .chat-msg.saeed { align-self: flex-end; background: #4c6fff22; border-bottom-left-radius: 4px; }
+    .chat-msg .chat-msg-user { font-size: 0.65rem; font-weight: bold; margin-bottom: 4px; display: block; color: inherit; opacity: 0.7; }
+    .chat-msg.saeed { align-self: flex-end; background: #4c6fff22; border-bottom-left-radius: 4px; color: #ccc; }
     .chat-msg.saeed .chat-msg-user { color: #4c6fff; }
-    .chat-msg.mohammadreza { align-self: flex-start; background: #9c27b022; border-bottom-right-radius: 4px; }
+    .chat-msg.mohammadreza { align-self: flex-start; background: #9c27b022; border-bottom-right-radius: 4px; color: #ccc; }
     .chat-msg.mohammadreza .chat-msg-user { color: #9c27b0; }
     .chat-input-bar { display: flex; gap: 8px; }
     .chat-input-bar input {
@@ -499,7 +511,7 @@
     .dash-card h3 {
       color: #fff;
       margin: 0 0 14px 0;
-      font-size: 0.95rem;
+      font-size: 1rem;
       border-bottom: 1px solid #222;
       padding-bottom: 8px;
     }
@@ -507,15 +519,48 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
+      padding: 12px 0;
       border-bottom: 1px solid #1a1a2a;
-      font-size: 0.85rem;
+      font-size: 1rem;
+      cursor: default;
     }
     .stat-row:last-child { border-bottom: none; }
     .stat-val { font-weight: bold; }
     .stat-saeed { color: #4c6fff; }
     .stat-mohammadreza { color: #9c27b0; }
     .stat-urgent { color: #e67e22; }
+    .stat-clickable { cursor: pointer; transition: 0.2s; border-radius: 8px; padding: 12px 8px !important; margin: 0 -8px; }
+    .stat-clickable:active { background: #ffffff11; }
+
+    #dashDetailContainer {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #333;
+      display: none;
+    }
+    .dash-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .dash-detail-header h4 {
+      color: #aaa;
+      font-size: 0.85rem;
+      margin: 0;
+      font-weight: normal;
+    }
+    .btn-close-detail {
+      background: #333;
+      border: none;
+      color: #ccc;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: Vazir, 'Segoe UI', Tahoma, sans-serif;
+    }
+    .btn-close-detail:active { transform: scale(0.9); }
 
     @media (max-width: 480px) {
       body { padding: 6px; }
@@ -544,6 +589,7 @@
       .chat-msg { font-size: 0.8rem; padding: 8px 12px; }
       .chat-input-bar input { padding: 12px 14px; font-size: 0.8rem; }
       .chat-input-bar button { padding: 12px 16px; font-size: 0.8rem; }
+      .stat-row { font-size: 0.9rem; }
     }
 
     @media (max-width: 380px) {
@@ -562,7 +608,7 @@
   <div id="loginView" class="login-view">
     <div class="login-box">
       <h2>ورود به سیستم</h2>
-      <input id="loginUser" type="text" placeholder="نام کاربری">
+      <input id="loginUser" type="text" placeholder="نام کاربری" autocapitalize="off" autocorrect="off">
       <input id="loginPass" type="password" placeholder="رمز عبور" onkeydown="if(event.key==='Enter')doLogin()">
       <button onclick="doLogin()">ورود</button>
       <p id="loginError" class="login-error">نام کاربری یا رمز عبور اشتباه است</p>
@@ -595,7 +641,7 @@
         <textarea id="taskDesc" placeholder="توضیحات (اختیاری)"></textarea>
         <div class="urgent-toggle" id="urgentToggle" onclick="toggleUrgent()">
           <span>فوری</span>
-          <div class="check-box" id="urgentCheck">✓</div>
+          <div class="check-box" id="urgentCheck"></div>
         </div>
         <div class="form-actions">
           <button class="secondary" onclick="prevStep()">قبلی</button>
@@ -673,8 +719,15 @@
 
     <div id="dashView" class="dash-view">
       <div class="dash-card">
-        <h3>آمار هفته جاری (تسک‌های این هفته)</h3>
+        <h3>آمار هفته جاری</h3>
         <div id="dashStatsContainer"></div>
+        <div id="dashDetailContainer">
+          <div class="dash-detail-header">
+            <h4 id="dashDetailTitle"></h4>
+            <button class="btn-close-detail" onclick="document.getElementById('dashDetailContainer').style.display='none'">بستن</button>
+          </div>
+          <div id="dashDetailList"></div>
+        </div>
       </div>
     </div>
   </div>
