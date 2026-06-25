@@ -1,26 +1,35 @@
 // ==========================================================
-// تنظیمات دیتابیس JSONBin
+// تنظیمات دیتابیس JSONBin و کاربران
 // ==========================================================
 const BIN_ID = "6a3c12b1da38895dfef890a0"; 
 const BIN_KEY = "$2a$10$X.Tg/856vciIsWVk/OEnjeW65O6V9yXhpcMPpUA6.MuHUuM/PSy0O"; 
 
+const USERS = {
+  "saeedmasoudi": { pass: "S@eed1994", name: "Saeed", displayName: "سعید" },
+  "mohammad": { pass: "mohammad212732", name: "Mohammadreza", displayName: "محمدرضا" }
+};
 
 // ============================
-// داده‌ها و توابع پایه
+// داده‌ها و متغیرهای سراسری
 // ============================
 let tasks = [];
+let chatMessages = [];
 let selectedDate = null;
 let currentMonth = 0;
 let selectedUser = "Saeed";
 let filterUser = "All";
+let isUrgent = false;
+let loggedInUser = null;
 
 const persianMonths = [
   "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
   "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
 ];
-
 const monthDays = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
 
+// ============================
+// توابع تاریخ
+// ============================
 function toPersianDate(gy, gm, gd) {
   const gDate = new Date(gy, gm - 1, gd);
   const gStart = new Date(2026, 2, 21);
@@ -58,6 +67,51 @@ function toDateKey(py, pm, pd) {
 }
 
 // ============================
+// لاگین و بررسی نشست
+// ============================
+function checkSession() {
+  const u = localStorage.getItem('appUser');
+  if (u && USERS[u]) {
+    loggedInUser = USERS[u].name;
+    showApp();
+  } else {
+    document.getElementById('loginView').style.display = 'flex';
+    document.getElementById('appView').style.display = 'none';
+  }
+}
+
+function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  if (USERS[username] && USERS[username].pass === password) {
+    localStorage.setItem('appUser', username);
+    loggedInUser = USERS[username].name;
+    showApp();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('appUser');
+  loggedInUser = null;
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  checkSession();
+}
+
+function showApp() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('appView').style.display = 'block';
+  loadTasks();
+  const today = getTodayPersian();
+  currentMonth = today.month - 1;
+  document.getElementById("monthSelect").value = currentMonth;
+  selectedDate = toDateKey(today.year, today.month, today.day);
+}
+
+// ============================
 // ارتباط با سرور JSONBin
 // ============================
 async function loadTasks() {
@@ -67,9 +121,11 @@ async function loadTasks() {
     });
     const data = await res.json();
     if (data && data.record && Array.isArray(data.record)) {
-      tasks = data.record.filter(t => !t.temp);
+      tasks = data.record.filter(t => !t.temp && t.type !== 'chat');
+      chatMessages = data.record.filter(t => t.type === 'chat');
     } else {
       tasks = [];
+      chatMessages = [];
     }
     refreshUI();
   } catch (error) {
@@ -80,32 +136,68 @@ async function loadTasks() {
 
 async function saveTasks() {
   try {
+    const all = [...tasks, ...chatMessages];
     await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',
         'X-Master-Key': BIN_KEY
       },
-      body: JSON.stringify(tasks)
+      body: JSON.stringify(all)
     });
   } catch (error) {
     console.error("خطا در ذخیره اطلاعات:", error);
   }
 }
 
-// چک کردن مداوم برای همگام‌سازی لحظه‌ای (هر ۳ ثانیه)
-setInterval(() => {
-  loadTasks();
-}, 3000);
+// همگام‌سازی هر ۳ ثانیه
+setInterval(() => { if(loggedInUser) loadTasks(); }, 3000);
 
 // ============================
-// رفرش کردن ظاهر سایت
+// اعلان‌ها
+// ============================
+function checkNotifications() {
+  if (!loggedInUser) return;
+  const today = getTodayPersian();
+  const todayKey = toDateKey(today.year, today.month, today.day);
+  
+  // پیام‌های چت جدید از طرف دیگه
+  const lastMsg = chatMessages[chatMessages.length - 1];
+  if (lastMsg && lastMsg.user !== loggedInUser) {
+    const userName = lastMsg.user === 'Saeed' ? 'سعید' : 'محمدرضا';
+    if (Notification.permission === "granted") {
+      new Notification(`پیام جدید از ${userName}`, { body: lastMsg.text });
+    }
+  }
+
+  // تسک‌های فوری امروز انجام نشده
+  const urgentToday = tasks.filter(t => t.date === todayKey && t.urgent && !t.done);
+  if (urgentToday.length > 0) {
+    if (Notification.permission === "granted") {
+      new Notification("تسک فوری!", { body: `شما ${urgentToday.length} تسک فوری برای امروز دارید.` });
+    }
+  }
+}
+
+// درخواست دسترسی اعلان
+if ("Notification" in window && Notification.permission === "default") {
+  Notification.requestPermission();
+}
+// چک اعلان هر ۱۰ ثانیه
+setInterval(checkNotifications, 10000);
+
+// ============================
+// رفرش ظاهر
 // ============================
 function refreshUI() {
   renderCalendar();
   if (selectedDate) {
     if (document.getElementById("todayView").style.display === "block") {
       renderTaskList(selectedDate, 'todayTaskList', 'todayTitle');
+    } else if (document.getElementById("chatView").style.display === "flex") {
+      renderChatMessages();
+    } else if (document.getElementById("dashView").style.display === "flex") {
+      renderDashboard();
     } else {
       showDayTasks(selectedDate);
     }
@@ -131,6 +223,11 @@ function setFilter(btn) {
   if (selectedDate) showDayTasks(selectedDate);
 }
 
+function toggleUrgent() {
+  isUrgent = !isUrgent;
+  document.getElementById('urgentToggle').classList.toggle('active', isUrgent);
+}
+
 function nextStep() {
   const title = document.getElementById("taskTitle").value.trim();
   if (!title) { alert("لطفاً عنوان تسک را وارد کنید"); return; }
@@ -145,25 +242,64 @@ function prevStep() {
   document.getElementById("taskTitle").focus();
 }
 
+function nextStep2() {
+  document.getElementById("step2").classList.remove("active");
+  document.getElementById("step3").classList.add("active");
+}
+
+function prevStep2() {
+  document.getElementById("step3").classList.remove("active");
+  document.getElementById("step2").classList.add("active");
+}
+
 // ============================
 // ناوبری
 // ============================
+function hideAllViews() {
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("todayView").style.display = "none";
+  document.getElementById("chatView").style.display = "none";
+  document.getElementById("dashView").style.display = "none";
+  document.getElementById("taskForm").style.display = "none";
+  document.getElementById("btnToday").style.display = "none";
+  document.getElementById("btnChat").style.display = "none";
+  document.getElementById("btnDash").style.display = "none";
+  document.getElementById("btnLogout").style.display = "none";
+  document.getElementById("btnHome").style.display = "flex";
+}
+
 function goToToday() {
   const today = getTodayPersian();
   const todayKey = toDateKey(today.year, today.month, today.day);
   selectedDate = todayKey;
-  document.getElementById("mainView").style.display = "none";
+  hideAllViews();
   document.getElementById("todayView").style.display = "block";
-  document.getElementById("btnToday").style.display = "none";
-  document.getElementById("btnHome").style.display = "flex";
   renderTaskList(todayKey, 'todayTaskList', 'todayTitle');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function openChat() {
+  hideAllViews();
+  document.getElementById("chatView").style.display = "flex";
+  renderChatMessages();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openDash() {
+  hideAllViews();
+  document.getElementById("dashView").style.display = "flex";
+  renderDashboard();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function goHome() {
-  document.getElementById("todayView").style.display = "none";
+  hideAllViews();
   document.getElementById("mainView").style.display = "block";
+  document.getElementById("taskForm").style.display = "block";
   document.getElementById("btnToday").style.display = "flex";
+  document.getElementById("btnChat").style.display = "flex";
+  document.getElementById("btnDash").style.display = "flex";
+  document.getElementById("btnLogout").style.display = "flex";
   document.getElementById("btnHome").style.display = "none";
   const today = getTodayPersian();
   currentMonth = today.month - 1;
@@ -200,14 +336,18 @@ async function addTask() {
     desc,
     user: selectedUser,
     date: dateKey,
-    done: false
+    done: false,
+    urgent: isUrgent
   });
+  
+  isUrgent = false;
+  document.getElementById('urgentToggle').classList.remove('active');
   
   await saveTasks();
   
   document.getElementById("taskTitle").value = "";
   document.getElementById("taskDesc").value = "";
-  document.getElementById("step2").classList.remove("active");
+  document.getElementById("step3").classList.remove("active");
   document.getElementById("step1").classList.add("active");
   document.getElementById("taskTitle").focus();
   
@@ -234,6 +374,11 @@ function renderCalendar() {
   const monthDiv = document.createElement("div");
   monthDiv.className = "month-grid";
   
+  const yearBadge = document.createElement("div");
+  yearBadge.className = "year-badge";
+  yearBadge.textContent = "سال ۱۴۰۵ شمسی";
+  monthDiv.appendChild(yearBadge);
+
   const title = document.createElement("div");
   title.className = "month-title";
   title.textContent = persianMonths[m];
@@ -351,6 +496,7 @@ function renderTaskList(dateKey, listId, titleId) {
     card.className = `task-card ${userClass} ${task.done ? "done" : ""} ${hasDesc ? "has-desc" : ""}`;
     
     let html = `
+      ${task.urgent ? '<span class="urgent-badge">فوری</span>' : ''}
       <div class="task-info" onclick="toggleCard(this.parentElement, event)">
         <b>
           <span class="user-badge ${badgeClass}">${task.user}</span>
@@ -376,7 +522,6 @@ function renderTaskList(dateKey, listId, titleId) {
   });
 }
 
-// رفع باگ تقویم: استفاده از شناسه صحیح
 function showDayTasks(dateKey) {
   renderTaskList(dateKey, 'dayTaskList', 'dayTitle');
 }
@@ -409,10 +554,102 @@ async function deleteTask(id) {
 }
 
 // ============================
+// چت
+// ============================
+function renderChatMessages() {
+  const container = document.getElementById("chatMessages");
+  if (chatMessages.length === 0) {
+    container.innerHTML = '<p style="color:#666;text-align:center;font-size:0.8rem;margin:auto;">هنوز پیامی ارسال نشده</p>';
+    return;
+  }
+  container.innerHTML = "";
+  chatMessages.forEach(msg => {
+    const div = document.createElement("div");
+    const userClass = msg.user === 'Saeed' ? 'saeed' : 'mohammadreza';
+    const userName = msg.user === 'Saeed' ? 'سعید' : 'محمدرضا';
+    div.className = `chat-msg ${userClass}`;
+    div.innerHTML = `<span class="chat-msg-user">${userName}</span>${msg.text}`;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if (!text) return;
+  
+  chatMessages.push({
+    id: Date.now(),
+    type: 'chat',
+    user: loggedInUser,
+    text: text
+  });
+  
+  input.value = "";
+  await saveTasks();
+  renderChatMessages();
+}
+
+// ============================
+// داشبورد هفتگی
+// ============================
+function getWeekRange() {
+  const todayG = new Date();
+  const dayOfWeek = todayG.getDay(); // 0=Sun, 6=Sat
+  const diffToSat = (dayOfWeek + 1) % 7; // Saturday in Iran
+  const startG = new Date(todayG);
+  startG.setDate(todayG.getDate() - diffToSat);
+  
+  let dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startG);
+    d.setDate(startG.getDate() + i);
+    const p = toPersianDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    dates.push(toDateKey(p.year, p.month, p.day));
+  }
+  return dates;
+}
+
+function renderDashboard() {
+  const container = document.getElementById("dashStatsContainer");
+  const weekDates = getWeekRange();
+  
+  const weekTasks = tasks.filter(t => weekDates.includes(t.date));
+  
+  const sTasks = weekTasks.filter(t => t.user === 'Saeed');
+  const mTasks = weekTasks.filter(t => t.user === 'Mohammadreza');
+  const urgentTasks = weekTasks.filter(t => t.urgent && !t.done);
+
+  const sDone = sTasks.filter(t => t.done).length;
+  const mDone = mTasks.filter(t => t.done).length;
+  const totalDone = weekTasks.filter(t => t.done).length;
+
+  container.innerHTML = `
+    <div class="stat-row">
+      <span>کل تسک‌های هفته</span>
+      <span class="stat-val" style="color:#fff">${weekTasks.length}</span>
+    </div>
+    <div class="stat-row">
+      <span>انجام شده</span>
+      <span class="stat-val" style="color:#4caf50">${totalDone}</span>
+    </div>
+    <div class="stat-row">
+      <span>تسک‌های فوری انجام نشده</span>
+      <span class="stat-val stat-urgent">${urgentTasks.length}</span>
+    </div>
+    <div class="stat-row">
+      <span>تسک‌های سعید (انجام شده / کل)</span>
+      <span class="stat-val stat-saeed">${sDone} / ${sTasks.length}</span>
+    </div>
+    <div class="stat-row">
+      <span>تسک‌های محمدرضا (انجام شده / کل)</span>
+      <span class="stat-val stat-mohammadreza">${mDone} / ${mTasks.length}</span>
+    </div>
+  `;
+}
+
+// ============================
 // مقداردهی اولیه
 // ============================
-loadTasks();
-const today = getTodayPersian();
-currentMonth = today.month - 1;
-document.getElementById("monthSelect").value = currentMonth;
-selectedDate = toDateKey(today.year, today.month, today.day);
+checkSession();
