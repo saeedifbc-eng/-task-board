@@ -21,6 +21,10 @@ let filterUser = "All";
 let isUrgent = false;
 let loggedInUser = null;
 
+// متغیرهای جلوگیری از تکرار نوتیفیکیشن
+let lastNotifiedUrgentIds = '';
+let lastNotifiedMsgId = null;
+
 const persianMonths = [
   "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
   "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
@@ -163,19 +167,30 @@ function checkNotifications() {
   const today = getTodayPersian();
   const todayKey = toDateKey(today.year, today.month, today.day);
   
+  // پیام‌های چت
   const lastMsg = chatMessages[chatMessages.length - 1];
-  if (lastMsg && lastMsg.user !== loggedInUser) {
+  if (lastMsg && lastMsg.user !== loggedInUser && lastMsg.id !== lastNotifiedMsgId) {
     const userName = lastMsg.user === 'Saeed' ? 'سعید' : 'محمدرضا';
     if (Notification.permission === "granted") {
       new Notification(`پیام جدید از ${userName}`, { body: lastMsg.text });
     }
+    lastNotifiedMsgId = lastMsg.id;
   }
 
+  // تسک‌های فوری
   const urgentToday = tasks.filter(t => t.date === todayKey && t.urgent && !t.done);
   if (urgentToday.length > 0) {
-    if (Notification.permission === "granted") {
-      new Notification("تسک فوری!", { body: `شما ${urgentToday.length} تسک فوری برای امروز دارید.` });
+    const currentUrgentIds = urgentToday.map(t => t.id).join(',');
+    // فقط اگر تسک فوری جدیدی اضافه شده بود نوتیفیکیشن بده
+    if (currentUrgentIds !== lastNotifiedUrgentIds) {
+      if (Notification.permission === "granted") {
+        new Notification("تسک فوری!", { body: `شما ${urgentToday.length} تسک فوری برای امروز دارید.` });
+      }
+      lastNotifiedUrgentIds = currentUrgentIds;
     }
+  } else {
+    // اگر تسک فوری انجام شد یا نبود، ریست کن تا دفعه بعد درست.Notify کنه
+    lastNotifiedUrgentIds = '';
   }
 }
 
@@ -567,7 +582,6 @@ function renderChatMessages() {
   const today = getTodayPersian();
   const todayKey = toDateKey(today.year, today.month, today.day);
   
-  // محاسبه تاریخ دیروز
   const yG = new Date();
   yG.setDate(yG.getDate() - 1);
   const yP = toPersianDate(yG.getFullYear(), yG.getMonth() + 1, yG.getDate());
@@ -576,9 +590,8 @@ function renderChatMessages() {
   let lastDate = null;
 
   chatMessages.forEach(msg => {
-    const msgDate = msg.date || todayKey; // برای پیام‌های قدیمی که تاریخ ندارند
+    const msgDate = msg.date || todayKey;
     
-    // اگر تاریخ پیام عوض شد، جداکننده تاریخ را اضافه کن
     if (msgDate !== lastDate) {
       const dateDiv = document.createElement("div");
       dateDiv.className = "chat-date-divider";
@@ -615,7 +628,6 @@ async function sendChat() {
   const pDate = getTodayPersian();
   const todayKey = toDateKey(pDate.year, pDate.month, pDate.day);
   
-  // تبدیل ساعت به فارسی و ۲۴ ساعته
   const timeStr = now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit', hour12: false});
   
   chatMessages.push({
@@ -637,8 +649,8 @@ async function sendChat() {
 // ============================
 function getWeekRange() {
   const todayG = new Date();
-  const dayOfWeek = todayG.getDay(); // 0=Sun, 6=Sat
-  const diffToSat = (dayOfWeek + 1) % 7; // Saturday in Iran
+  const dayOfWeek = todayG.getDay();
+  const diffToSat = (dayOfWeek + 1) % 7;
   const startG = new Date(todayG);
   startG.setDate(todayG.getDate() - diffToSat);
   
@@ -654,7 +666,6 @@ function getWeekRange() {
 
 function renderDashboard() {
   const container = document.getElementById("dashStatsContainer");
-  document.getElementById("dashDetailContainer").style.display = "none";
   
   const weekDates = getWeekRange();
   const weekTasks = tasks.filter(t => weekDates.includes(t.date));
