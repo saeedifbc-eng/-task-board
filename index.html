@@ -179,22 +179,31 @@
     .lead-form button { background: #2e7d32; border: none; padding: 12px; border-radius: 14px; color: white; font-weight: bold; cursor: pointer; font-size: 0.9rem; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; transition: 0.2s; }
     .lead-form button:active { transform: scale(0.95); }
     .lead-search-input { background: #252535; border: none; padding: 12px 16px; border-radius: 30px; color: white; outline: none; font-size: 0.9rem; width: 100%; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; }
-    .lead-card { background: #222235; border-radius: 14px; padding: 12px; border-right: 4px solid #2e7d32; display: flex; flex-direction: column; gap: 6px; position: relative; }
-    .lead-card b { font-size: 0.95rem; display: block; color: #fff; }
-    .lead-card .lead-phone-badge { display: inline-block; background: #ffffff11; color: #aaa; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; margin-top: -4px; direction: ltr; text-align: right; }
-    .lead-actions { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-    .lead-actions a, .lead-actions button { flex: 1 1 40%; text-align: center; padding: 8px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; text-decoration: none; font-weight: bold; border: 1px solid transparent; }
-    .lead-actions a:active, .lead-actions button:active { transform: scale(0.95); }
-    .lead-actions .btn-call { background: #2e7d3222; color: #2e7d32; border-color: #2e7d3244; }
-    .lead-actions .btn-edit-lead { background: #4c6fff22; color: #4c6fff; border-color: #4c6fff44; }
-    .lead-actions .btn-note-lead { background: #9c27b022; color: #9c27b0; border-color: #9c27b044; }
-    .lead-actions .btn-del-lead { background: #8b2d2d22; color: #ff5555; border-color: #8b2d2d44; }
     
-    .lead-timeline { margin-top: 10px; padding-right: 12px; border-right: 2px solid #444; display: flex; flex-direction: column; gap: 10px; }
+    .lead-card { background: #222235; border-radius: 14px; padding: 12px; border-right: 4px solid #2e7d32; display: flex; flex-direction: column; gap: 6px; cursor: pointer; transition: 0.2s; }
+    .lead-card:active { transform: scale(0.98); }
+    .lead-header { display: flex; justify-content: space-between; align-items: center; }
+    .lead-header b { font-size: 0.95rem; display: block; color: #fff; }
+    .lead-header .lead-phone-badge { background: #ffffff11; color: #888; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; margin-top: 4px; display: inline-block; direction: ltr; text-align: right; }
+    .lead-header .btn-call { background: #333; color: #ddd; padding: 6px 14px; border-radius: 12px; text-decoration: none; font-size: 0.8rem; font-weight: bold; border: none; transition: 0.2s; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; }
+    .lead-header .btn-call:active { transform: scale(0.95); background: #444; }
+    
+    .lead-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; }
+    .lead-card.expanded .lead-details { display: block; }
+    
+    .lead-detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .lead-detail-header h4 { color: #aaa; font-size: 0.8rem; margin: 0; font-weight: normal; }
+    
+    .lead-timeline { padding-right: 12px; border-right: 2px solid #444; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
     .lead-note { position: relative; }
     .lead-note::before { content: ''; position: absolute; right: -17px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #2e7d32; border: 2px solid #0f0f14; }
     .lead-note-time { color: #666; font-size: 0.7rem; display: block; margin-bottom: 2px; }
     .lead-note-text { color: #ccc; font-size: 0.85rem; line-height: 1.6; word-break: break-word; white-space: pre-wrap; }
+    
+    .lead-actions { display: flex; gap: 6px; }
+    .lead-actions button { flex: 1; background: #333; color: #ccc; border: none; padding: 10px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; font-weight: bold; }
+    .lead-actions button:active { transform: scale(0.95); }
+    .lead-actions .btn-del-lead { background: #8b2d2d; color: #fff; }
 
     /* ===== نوار ناوبری پایین ===== */
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #12121aee; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 200; padding: 10px 0; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
@@ -229,7 +238,7 @@
       .stat-row { font-size: 0.9rem; }
       .bnav-item { font-size: 0.65rem; padding: 4px 10px; }
       .bnav-icon { font-size: 1.1rem; }
-      .lead-actions a, .lead-actions button { font-size: 0.65rem; padding: 6px 8px; }
+      .lead-actions button { font-size: 0.7rem; padding: 8px; }
     }
 
     @media (max-width: 380px) {
@@ -337,20 +346,20 @@
       <div class="dash-card">
         <h3>آمار هفته جاری</h3>
         <div id="dashStatsContainer"></div>
-        <div id="dashDetailContainer">
-          <div class="dash-detail-header">
-            <h4 id="dashDetailTitle"></h4>
-            <button class="btn-close-detail" onclick="document.getElementById('dashDetailContainer').style.display='none'">بستن</button>
-          </div>
-          <div id="dashDetailList"></div>
+      </div>
+      <div id="dashDetailContainer">
+        <div class="dash-detail-header">
+          <h4 id="dashDetailTitle"></h4>
+          <button class="btn-close-detail" onclick="closeDashDetail()">بستن</button>
         </div>
+        <div id="dashDetailList"></div>
       </div>
     </div>
 
     <div id="leadsView" class="leads-view">
       <div class="lead-form">
         <input id="leadName" type="text" placeholder="نام مشتری">
-        <input id="leadPhone" type="tel" placeholder="شماره تماس (مثلا 09121234567)">
+        <input id="leadPhone" type="tel" placeholder="شماره تماس (مثلا 09121234567)" autocapitalize="off" autocorrect="off">
         <textarea id="leadDesc" placeholder="توضیحات اولیه (اختیاری)"></textarea>
         <button onclick="addLead()">+ ثبت لید جدید</button>
       </div>

@@ -318,6 +318,14 @@ async function sendChat() {
 // ============================
 // لیدها
 // ============================
+function openLeadCard(headerEl) {
+  headerEl.closest('.lead-card').classList.add('expanded');
+}
+
+function closeLeadCard(btnEl) {
+  btnEl.closest('.lead-card').classList.remove('expanded');
+}
+
 async function addLead() {
   const name = document.getElementById("leadName").value.trim();
   const phone = document.getElementById("leadPhone").value.trim();
@@ -372,7 +380,12 @@ async function deleteLead(id) {
 function renderLeads() {
   const container = document.getElementById("leadsList");
   const searchTerm = document.getElementById("leadSearchInput").value.trim().toLowerCase();
-  
+
+  const expandedIds = new Set();
+  container.querySelectorAll('.lead-card.expanded').forEach(card => {
+    expandedIds.add(card.dataset.leadId);
+  });
+
   let filteredLeads = leads;
   if (searchTerm) {
     filteredLeads = leads.filter(l => l.name.toLowerCase().includes(searchTerm));
@@ -387,14 +400,14 @@ function renderLeads() {
   filteredLeads.forEach(lead => {
     const card = document.createElement("div");
     card.className = "lead-card";
+    card.dataset.leadId = String(lead.id);
+    if (expandedIds.has(String(lead.id))) card.classList.add('expanded');
     
-    // سازگاری با لیدهای قدیمی که ممکنه آرایه notes نداشته باشند
     let notesArr = lead.notes || [];
     if (lead.desc && notesArr.length === 0) {
       notesArr = [{ text: lead.desc, time: 'تاریخ نامشخص' }];
     }
     
-    // ساخت تایم‌لاین
     let timelineHTML = '<div class="lead-timeline">';
     notesArr.slice().reverse().forEach(note => {
       timelineHTML += `
@@ -407,14 +420,21 @@ function renderLeads() {
     timelineHTML += '</div>';
 
     card.innerHTML = `
-      <b>${lead.name}</b>
-      <span class="lead-phone-badge">${lead.phone}</span>
-      ${timelineHTML}
-      <div class="lead-actions">
-        <a href="tel:${lead.phone}" class="btn-call">📞 تماس</a>
-        <button class="btn-edit-lead" onclick="editLeadInfo(${lead.id})">✏️ ویرایش</button>
-        <button class="btn-note-lead" onclick="addLeadNote(${lead.id})">💬 یادداشت</button>
-        <button class="btn-del-lead" onclick="deleteLead(${lead.id})">🗑 حذف</button>
+      <div class="lead-header" onclick="openLeadCard(this)">
+        <div>
+          <b>${lead.name}</b><br>
+          <span class="lead-phone-badge">${lead.phone}</span>
+        </div>
+        <a href="tel:${lead.phone}" class="btn-call" onclick="event.stopPropagation()">تماس</a>
+      </div>
+      <div class="lead-details">
+        <button onclick="event.stopPropagation(); closeLeadCard(this)" style="background:transparent;border:none;color:#888;font-size:1.1rem;cursor:pointer;float:left;padding:0 4px;line-height:1;">✕</button>
+        ${timelineHTML}
+        <div class="lead-actions">
+          <button class="btn-edit-lead" onclick="event.stopPropagation(); editLeadInfo(${lead.id})">ویرایش</button>
+          <button class="btn-note-lead" onclick="event.stopPropagation(); addLeadNote(${lead.id})">یادداشت</button>
+          <button class="btn-del-lead" onclick="event.stopPropagation(); deleteLead(${lead.id})">حذف</button>
+        </div>
       </div>
     `;
     container.appendChild(card);
