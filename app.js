@@ -21,7 +21,6 @@ let filterUser = "All";
 let isUrgent = false;
 let loggedInUser = null;
 
-// متغیرهای جلوگیری از تکرار نوتیفیکیشن
 let lastNotifiedUrgentIds = '';
 let lastNotifiedMsgId = null;
 
@@ -88,9 +87,7 @@ function doLogin() {
   const username = document.getElementById('loginUser').value.trim().toLowerCase();
   const password = document.getElementById('loginPass').value;
   if (USERS[username] && USERS[username].pass === password) {
-    try {
-      localStorage.setItem('appUser', username);
-    } catch (e) {}
+    try { localStorage.setItem('appUser', username); } catch (e) {}
     loggedInUser = USERS[username].name;
     showApp();
   } else {
@@ -156,7 +153,6 @@ async function saveTasks() {
   }
 }
 
-// همگام‌سازی هر ۳ ثانیه
 setInterval(() => { if(loggedInUser) loadTasks(); }, 3000);
 
 // ============================
@@ -167,7 +163,6 @@ function checkNotifications() {
   const today = getTodayPersian();
   const todayKey = toDateKey(today.year, today.month, today.day);
   
-  // پیام‌های چت
   const lastMsg = chatMessages[chatMessages.length - 1];
   if (lastMsg && lastMsg.user !== loggedInUser && lastMsg.id !== lastNotifiedMsgId) {
     const userName = lastMsg.user === 'Saeed' ? 'سعید' : 'محمدرضا';
@@ -177,11 +172,9 @@ function checkNotifications() {
     lastNotifiedMsgId = lastMsg.id;
   }
 
-  // تسک‌های فوری
   const urgentToday = tasks.filter(t => t.date === todayKey && t.urgent && !t.done);
   if (urgentToday.length > 0) {
     const currentUrgentIds = urgentToday.map(t => t.id).join(',');
-    // فقط اگر تسک فوری جدیدی اضافه شده بود نوتیفیکیشن بده
     if (currentUrgentIds !== lastNotifiedUrgentIds) {
       if (Notification.permission === "granted") {
         new Notification("تسک فوری!", { body: `شما ${urgentToday.length} تسک فوری برای امروز دارید.` });
@@ -189,7 +182,6 @@ function checkNotifications() {
       lastNotifiedUrgentIds = currentUrgentIds;
     }
   } else {
-    // اگر تسک فوری انجام شد یا نبود، ریست کن تا دفعه بعد درست.Notify کنه
     lastNotifiedUrgentIds = '';
   }
 }
@@ -275,11 +267,9 @@ function hideAllViews() {
   document.getElementById("chatView").style.display = "none";
   document.getElementById("dashView").style.display = "none";
   document.getElementById("taskForm").style.display = "none";
-  document.getElementById("btnToday").style.display = "none";
-  document.getElementById("btnChat").style.display = "none";
-  document.getElementById("btnDash").style.display = "none";
-  document.getElementById("btnLogout").style.display = "none";
-  document.getElementById("btnHome").style.display = "flex";
+  
+  // حذف حالت فعال از نوار پایین
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
 }
 
 function goToToday() {
@@ -288,6 +278,7 @@ function goToToday() {
   selectedDate = todayKey;
   hideAllViews();
   document.getElementById("todayView").style.display = "block";
+  document.getElementById("bnavToday").classList.add("active");
   renderTaskList(todayKey, 'todayTaskList', 'todayTitle');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -295,6 +286,7 @@ function goToToday() {
 function openChat() {
   hideAllViews();
   document.getElementById("chatView").style.display = "flex";
+  document.getElementById("bnavChat").classList.add("active");
   renderChatMessages();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -302,6 +294,7 @@ function openChat() {
 function openDash() {
   hideAllViews();
   document.getElementById("dashView").style.display = "flex";
+  document.getElementById("bnavHome").classList.add("active");
   renderDashboard();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -310,11 +303,7 @@ function goHome() {
   hideAllViews();
   document.getElementById("mainView").style.display = "block";
   document.getElementById("taskForm").style.display = "block";
-  document.getElementById("btnToday").style.display = "flex";
-  document.getElementById("btnChat").style.display = "flex";
-  document.getElementById("btnDash").style.display = "flex";
-  document.getElementById("btnLogout").style.display = "flex";
-  document.getElementById("btnHome").style.display = "none";
+  document.getElementById("bnavHome").classList.add("active");
   const today = getTodayPersian();
   currentMonth = today.month - 1;
   document.getElementById("monthSelect").value = currentMonth;
@@ -483,7 +472,7 @@ function renderCalendar() {
 }
 
 // ============================
-// ساخت کارت‌ها
+// ساخت کارت‌ها با مرتب‌سازی هوشمند
 // ============================
 function renderTaskList(dateKey, listId, titleId) {
   const listDiv = document.getElementById(listId);
@@ -502,6 +491,13 @@ function renderTaskList(dateKey, listId, titleId) {
     return;
   }
   
+  // مرتب‌سازی هوشمند: فوری‌های انجام نشده -> معمولی‌های انجام نشده -> فوری‌های انجام شده -> معمولی‌های انجام شده
+  filtered.sort((a, b) => {
+    const scoreA = (a.done ? 2 : 0) + (a.urgent ? 0 : 1);
+    const scoreB = (b.done ? 2 : 0) + (b.urgent ? 0 : 1);
+    return scoreA - scoreB;
+  });
+
   listDiv.innerHTML = "";
   filtered.forEach(task => {
     const card = document.createElement("div");
