@@ -22,6 +22,7 @@ let filterUser = "All";
 let isUrgent = false;
 let loggedInUser = null;
 let expandedTaskIds = new Set();
+let isDataLoaded = false; // قفل امنیتی برای جلوگیری از پاک شدن داده ها
 
 let lastNotifiedUrgentIds = '';
 let lastNotifiedMsgId = null;
@@ -103,11 +104,21 @@ async function loadTasks() {
       chatMessages = data.record.filter(t => t.type === 'chat');
       leads = data.record.filter(t => t.type === 'lead');
     } else { tasks = []; chatMessages = []; leads = []; }
+    
+    isDataLoaded = true; // تایید میکنه که اطلاعات با موفقیت لود شده
     refreshUI();
-  } catch (error) { console.error("خطا در دریافت اطلاعات:", error); refreshUI(); }
+  } catch (error) { 
+    console.error("خطا در دریافت اطلاعات:", error); 
+    refreshUI(); 
+  }
 }
 
 async function saveTasks() {
+  // قفل امنیتی: اگر اطلاعات از سرور لود نشده بود، اجازه ذخیره سازی نمیده تا دیتای قدیمی پاک نشه
+  if (!isDataLoaded) {
+    alert("لطفاً چند ثانیه صبر کنید تا اطلاعات از سرور دریافت شوند...");
+    return;
+  }
   try {
     const all = [...tasks, ...chatMessages, ...leads];
     await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
