@@ -22,7 +22,7 @@ let filterUser = "All";
 let isUrgent = false;
 let loggedInUser = null;
 let expandedTaskIds = new Set();
-let isDataLoaded = false; // قفل امنیتی برای جلوگیری از پاک شدن داده ها
+let hasShownApiError = false; // جلوگیری از نمایش پیام خطای تکراری
 
 let lastNotifiedUrgentIds = '';
 let lastNotifiedMsgId = null;
@@ -93,39 +93,72 @@ function showApp() {
 }
 
 // ============================
-// ارتباط با سرور JSONBin
+// ارتباط با سرور JSONBin (نسخه دیباگ شده)
 // ============================
 async function loadTasks() {
   try {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': BIN_KEY } });
-    const data = await res.json();
+    let data;
+    try { data = await res.json(); } catch(e) { throw new Error("پاسخ سرور نامعتبر بود"); }
+
+    if (!res.ok) {
+      if (!hasShownApiError) {
+        hasShownApiError = true;
+        alert("خطا در دریافت اطلاعات:\n" + (data.message || "کد خطا: " + res.status) + "\n\nاگر ارور Bin not found بود، یعنی سطل دیتا در jsonbin پاک شده و باید یک سطل جدید بسازید.");
+      }
+      refreshUI();
+      return;
+    }
+
+    hasShownApiError = false; // ریست شدن ارور در صورت موفقیت
+
     if (data && data.record && Array.isArray(data.record)) {
       tasks = data.record.filter(t => !t.temp && t.type !== 'chat' && t.type !== 'lead');
       chatMessages = data.record.filter(t => t.type === 'chat');
       leads = data.record.filter(t => t.type === 'lead');
-    } else { tasks = []; chatMessages = []; leads = []; }
-    
-    isDataLoaded = true; // تایید میکنه که اطلاعات با موفقیت لود شده
+    } else { 
+      tasks = []; chatMessages = []; leads = []; 
+    }
     refreshUI();
   } catch (error) { 
     console.error("خطا در دریافت اطلاعات:", error); 
+    if (!hasShownApiError) {
+      hasShownApiError = true;
+      alert("خطا در اینترنت یا سرور:\n" + error.message);
+    }
     refreshUI(); 
   }
 }
 
 async function saveTasks() {
-  // قفل امنیتی: اگر اطلاعات از سرور لود نشده بود، اجازه ذخیره سازی نمیده تا دیتای قدیمی پاک نشه
-  if (!isDataLoaded) {
-    alert("لطفاً چند ثانیه صبر کنید تا اطلاعات از سرور دریافت شوند...");
-    return;
-  }
   try {
     const all = [...tasks, ...chatMessages, ...leads];
-    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: 'PUT', 
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
       body: JSON.stringify(all)
     });
-  } catch (error) { console.error("خطا در ذخیره اطلاعات:", error); }
+    
+    let responseData;
+    try { responseData = await res.json(); } catch(e) { throw new Error("پاسخ سرور نامعتبر بود"); }
+
+    if (!res.ok) {
+      const errMsg = responseData.message || "کد خطا: " + res.status;
+      console.error("Save Error:", errMsg);
+      if (!hasShownApiError) {
+        hasShownApiError = true;
+        alert("خطا در ذخیره:\n" + errMsg);
+      }
+    } else {
+      hasShownApiError = false;
+    }
+  } catch (error) { 
+    console.error("خطا در ذخیره اطلاعات:", error); 
+    if (!hasShownApiError) {
+      hasShownApiError = true;
+      alert("خطا در ذخیره:\n" + error.message);
+    }
+  }
 }
 
 setInterval(() => { if(loggedInUser) loadTasks(); }, 3000);
