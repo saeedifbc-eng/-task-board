@@ -149,9 +149,9 @@
     .chat-msg.mohammadreza .chat-msg-user { color: #9c27b0; }
     .chat-input-bar { display: flex; gap: 8px; }
     .chat-input-bar input { flex: 1; background: #252535; border: none; padding: 14px 16px; border-radius: 16px; color: white; outline: none; font-size: 0.9rem; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; }
-    .chat-input-bar button { background: #2e7d32; border: none; padding: 14px 20px; border-radius: 16px; color: white; font-weight: bold; cursor: pointer; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; font-size: 0.9rem; transition: 0.2s; white-space: nowrap; }
+    .chat-input-bar button { background: #4c6fff; border: none; padding: 14px 20px; border-radius: 16px; color: white; font-weight: bold; cursor: pointer; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; font-size: 0.9rem; transition: 0.2s; white-space: nowrap; }
     .chat-input-bar button:active { transform: scale(0.95); }
-    .chat-input-bar button:hover { background: #1e5a22; }
+    .chat-input-bar button:hover { background: #3a56d4; }
 
     /* ===== داشبورد هفتگی ===== */
     .dash-view { display: none; flex-direction: column; gap: 14px; }
@@ -176,8 +176,9 @@
     .lead-form { background: #1a1a24; padding: 14px; border-radius: 16px; display: flex; flex-direction: column; gap: 8px; }
     .lead-form input, .lead-form textarea { background: #252535; border: none; padding: 12px 14px; border-radius: 14px; color: white; outline: none; font-size: 0.9rem; width: 100%; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; resize: none; }
     .lead-form textarea { height: 60px; }
-    .lead-form button { background: #2e7d32; border: none; padding: 12px; border-radius: 14px; color: white; font-weight: bold; cursor: pointer; font-size: 0.9rem; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; transition: 0.2s; }
+    .lead-form button { background: #4c6fff; border: none; padding: 12px; border-radius: 14px; color: white; font-weight: bold; cursor: pointer; font-size: 0.9rem; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; transition: 0.2s; }
     .lead-form button:active { transform: scale(0.95); }
+    .lead-form button:hover { background: #3a56d4; }
     .lead-search-input { background: #252535; border: none; padding: 12px 16px; border-radius: 30px; color: white; outline: none; font-size: 0.9rem; width: 100%; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; }
     
     .lead-card { background: #222235; border-radius: 14px; padding: 12px; border-right: 4px solid #2e7d32; display: flex; flex-direction: column; gap: 6px; cursor: pointer; transition: 0.2s; }
@@ -208,7 +209,7 @@
     /* ===== نوار ناوبری پایین ===== */
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #12121aee; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 200; padding: 10px 0; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
     .bnav-item { background: transparent; border: none; color: #555; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 14px; border-radius: 12px; }
-    .bnav-item.active { color: #fff; background: #4c6fff22; }
+    .bnav-item.active { color: #fff; background: #4c6fff; }
     .bnav-item:active { transform: scale(0.9); }
     .bnav-icon { font-size: 1.3rem; display: block; line-height: 1; }
     .bnav-label { display: block; }
@@ -379,7 +380,7 @@
         <input id="leadName" type="text" placeholder="نام مشتری">
         <input id="leadPhone" type="tel" placeholder="شماره تماس (مثلا 09121234567)" autocapitalize="off" autocorrect="off">
         <textarea id="leadDesc" placeholder="توضیحات اولیه (اختیاری)"></textarea>
-        <button onclick="addLead()">+ ثبت لید جدید</button>
+        <button onclick="addLead()">ثبت</button>
       </div>
       <input class="lead-search-input" id="leadSearchInput" type="text" placeholder="جستجو بر اساس نام..." oninput="renderLeads()">
       <div id="leadsList"></div>
@@ -393,7 +394,7 @@
     <div class="bottom-nav" id="bottomNav">
       <button class="bnav-item active" id="bnavHome" onclick="goHome()">
         <span class="bnav-icon">☰</span>
-        <span class="bnav-label">تقویم</span>
+        <span class="bnav-label">خانه</span>
       </button>
       <button class="bnav-item" id="bnavToday" onclick="goToToday()">
         <span class="bnav-icon">◉</span>
