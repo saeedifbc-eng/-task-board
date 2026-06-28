@@ -21,6 +21,7 @@ let selectedUser = "Saeed";
 let filterUser = "All";
 let isUrgent = false;
 let loggedInUser = null;
+let expandedTaskIds = new Set();
 
 let lastNotifiedUrgentIds = '';
 let lastNotifiedMsgId = null;
@@ -220,7 +221,16 @@ async function addTask() {
   document.getElementById("taskTitle").focus(); refreshUI();
 }
 
-function toggleCard(cardEl, event) { event.stopPropagation(); cardEl.classList.toggle("expanded"); }
+function toggleCard(cardEl, event) {
+  event.stopPropagation();
+  const id = parseInt(cardEl.dataset.taskId);
+  if (expandedTaskIds.has(id)) {
+    expandedTaskIds.delete(id);
+  } else {
+    expandedTaskIds.add(id);
+  }
+  showDayTasks(selectedDate);
+}
 
 // ============================
 // رندر تقویم
@@ -265,8 +275,9 @@ function renderTaskList(dateKey, listId, titleId) {
   filtered.forEach(task => {
     const card = document.createElement("div"); const userClass = task.user === 'Saeed' ? 'user-saeed' : 'user-mohammadreza';
     const badgeClass = task.user === 'Saeed' ? 'saeed' : 'mohammadreza'; const hasDesc = task.desc && task.desc.length > 0;
-    card.className = `task-card ${userClass} ${task.done ? "done" : ""} ${hasDesc ? "has-desc" : ""}`;
-    let html = `${task.urgent ? '<span class="urgent-badge">فوری</span>' : ''}
+    card.dataset.taskId = task.id;
+    card.className = `task-card ${userClass} ${task.done ? "done" : ""} ${hasDesc ? "has-desc" : ""} ${expandedTaskIds.has(task.id) ? "expanded" : ""}`;
+    let html = `<button class="task-close-btn" onclick="closeTaskCard(${task.id}, event)">✕</button>${task.urgent ? '<span class="urgent-badge">فوری</span>' : ''}
       <div class="task-info" onclick="toggleCard(this.parentElement, event)"><b><span class="user-badge ${badgeClass}">${task.user}</span>${task.title}</b><small>${task.desc || ''}</small></div>
       <span class="expand-hint" onclick="toggleCard(this.parentElement, event)">برای دیدن توضیحات کامل کلیک کنید</span>`;
     if (hasDesc) html += `<div class="full-desc">${task.desc}</div>`;
@@ -318,14 +329,6 @@ async function sendChat() {
 // ============================
 // لیدها
 // ============================
-function openLeadCard(headerEl) {
-  headerEl.closest('.lead-card').classList.add('expanded');
-}
-
-function closeLeadCard(btnEl) {
-  btnEl.closest('.lead-card').classList.remove('expanded');
-}
-
 async function addLead() {
   const name = document.getElementById("leadName").value.trim();
   const phone = document.getElementById("leadPhone").value.trim();
@@ -381,18 +384,13 @@ function renderLeads() {
   const container = document.getElementById("leadsList");
   const searchTerm = document.getElementById("leadSearchInput").value.trim().toLowerCase();
 
-  const expandedIds = new Set();
-  container.querySelectorAll('.lead-card.expanded').forEach(card => {
-    expandedIds.add(card.dataset.leadId);
-  });
-
   let filteredLeads = leads;
   if (searchTerm) {
     filteredLeads = leads.filter(l => l.name.toLowerCase().includes(searchTerm));
   }
 
   if (filteredLeads.length === 0) {
-    container.innerHTML = `<p style="color:#666; text-align:center; font-size:0.85rem; margin-top:20px;">${searchTerm ? 'نتیجه‌ای یافت نشد' : 'هیچ لیدی ثبت نشده است'}</p>`;
+    container.innerHTML = `<p style="color:#666; text-align:center; font-size:0.85rem; margin-top:20px; grid-column: span 2;">${searchTerm ? 'نتیجه‌ای یافت نشد' : 'هیچ لیدی ثبت نشده است'}</p>`;
     return;
   }
 
@@ -400,41 +398,14 @@ function renderLeads() {
   filteredLeads.forEach(lead => {
     const card = document.createElement("div");
     card.className = "lead-card";
-    card.dataset.leadId = String(lead.id);
-    if (expandedIds.has(String(lead.id))) card.classList.add('expanded');
     
-    let notesArr = lead.notes || [];
-    if (lead.desc && notesArr.length === 0) {
-      notesArr = [{ text: lead.desc, time: 'تاریخ نامشخص' }];
-    }
-    
-    let timelineHTML = '<div class="lead-timeline">';
-    notesArr.slice().reverse().forEach(note => {
-      timelineHTML += `
-        <div class="lead-note">
-          <span class="lead-note-time">${note.time}</span>
-          <div class="lead-note-text">${note.text}</div>
-        </div>
-      `;
-    });
-    timelineHTML += '</div>';
-
     card.innerHTML = `
-      <div class="lead-header" onclick="openLeadCard(this)">
+      <div class="lead-header" onclick="openLeadModal(${lead.id})">
         <div>
           <b>${lead.name}</b><br>
           <span class="lead-phone-badge">${lead.phone}</span>
         </div>
         <a href="tel:${lead.phone}" class="btn-call" onclick="event.stopPropagation()">تماس</a>
-      </div>
-      <div class="lead-details">
-        <button onclick="event.stopPropagation(); closeLeadCard(this)" style="background:transparent;border:none;color:#888;font-size:1.1rem;cursor:pointer;float:left;padding:0 4px;line-height:1;">✕</button>
-        ${timelineHTML}
-        <div class="lead-actions">
-          <button class="btn-edit-lead" onclick="event.stopPropagation(); editLeadInfo(${lead.id})">ویرایش</button>
-          <button class="btn-note-lead" onclick="event.stopPropagation(); addLeadNote(${lead.id})">یادداشت</button>
-          <button class="btn-del-lead" onclick="event.stopPropagation(); deleteLead(${lead.id})">حذف</button>
-        </div>
       </div>
     `;
     container.appendChild(card);
@@ -473,6 +444,63 @@ function showDashDetail(type) {
   if (filtered.length === 0) { listEl.innerHTML = '<p style="color:#666; font-size:0.85rem;">تسکی یافت نشد</p>'; }
   else { listEl.innerHTML = ""; filtered.forEach(task => { const card = document.createElement("div"); const userClass = task.user === 'Saeed' ? 'user-saeed' : 'user-mohammadreza'; card.className = `task-card ${userClass} ${task.done ? "done" : ""}`; card.style.cursor = "default"; card.innerHTML = `${task.urgent ? '<span class="urgent-badge">فوری</span>' : ''}<div class="task-info"><b>${task.title}</b><small>${task.desc || ''}</small></div>`; listEl.appendChild(card); }); }
   container.style.display = "block";
+}
+
+// ============================
+// بستن کارت تسک با ضربدر
+// ============================
+function closeTaskCard(id, event) {
+  if (event) event.stopPropagation();
+  expandedTaskIds.delete(id);
+  const card = document.querySelector(`.task-card[data-task-id="${id}"]`);
+  if (card) card.classList.remove("expanded");
+}
+
+// ============================
+// مودال لیدها
+// ============================
+function openLeadModal(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+  
+  let notesArr = lead.notes || [];
+  if (lead.desc && notesArr.length === 0) {
+    notesArr = [{ text: lead.desc, time: 'تاریخ نامشخص' }];
+  }
+  
+  let timelineHTML = '<div class="lead-timeline">';
+  notesArr.slice().reverse().forEach(note => {
+    timelineHTML += `
+      <div class="lead-note">
+        <span class="lead-note-time">${note.time}</span>
+        <div class="lead-note-text">${note.text}</div>
+      </div>
+    `;
+  });
+  timelineHTML += '</div>';
+
+  const modal = document.getElementById('leadModal');
+  modal.querySelector('.modal-content').innerHTML = `
+    <button class="modal-close" onclick="closeLeadModal()">✕</button>
+    <div class="modal-header">
+      <div>
+        <b>${lead.name}</b><br>
+        <span class="lead-phone-badge">${lead.phone}</span>
+      </div>
+      <a href="tel:${lead.phone}" class="btn-call">تماس</a>
+    </div>
+    ${timelineHTML}
+    <div class="lead-actions" style="margin-top: 16px;">
+      <button onclick="editLeadInfo(${lead.id}); closeLeadModal();">ویرایش</button>
+      <button onclick="addLeadNote(${lead.id}); closeLeadModal();">یادداشت</button>
+      <button class="btn-del-lead" onclick="deleteLead(${lead.id}); closeLeadModal();">حذف</button>
+    </div>
+  `;
+  modal.style.display = 'flex';
+}
+
+function closeLeadModal() {
+  document.getElementById('leadModal').style.display = 'none';
 }
 
 // ============================

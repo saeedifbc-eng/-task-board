@@ -213,6 +213,23 @@
     .bnav-icon { font-size: 1.3rem; display: block; line-height: 1; }
     .bnav-label { display: block; }
 
+    /* ===== گرید و مودال لیدها ===== */
+    #leadsList { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    #leadModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 300; justify-content: center; align-items: center; padding: 20px; }
+    #leadModal .modal-content { background: #222235; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; border-right: 4px solid #2e7d32; position: relative; }
+    #leadModal .modal-close { position: absolute; top: 12px; left: 12px; background: #444; border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    #leadModal .modal-close:active { transform: scale(0.9); background: #666; }
+    #leadModal .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; padding-left: 40px; }
+    #leadModal .modal-header b { font-size: 1.1rem; color: #fff; }
+    #leadModal .modal-header .lead-phone-badge { background: #ffffff11; color: #888; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; margin-top: 4px; display: inline-block; direction: ltr; text-align: right; }
+    #leadModal .btn-call { background: #333; color: #ddd; padding: 8px 16px; border-radius: 12px; text-decoration: none; font-size: 0.85rem; font-weight: bold; border: none; transition: 0.2s; font-family: Vazir, 'Segoe UI', Tahoma, sans-serif; white-space: nowrap; }
+    #leadModal .btn-call:active { transform: scale(0.95); background: #444; }
+
+    /* ===== دکمه ضربدر کارت تسک ===== */
+    .task-close-btn { position: absolute; top: 8px; left: 10px; background: #444; border: none; color: #ccc; width: 24px; height: 24px; border-radius: 50%; font-size: 0.8rem; cursor: pointer; display: none; align-items: center; justify-content: center; transition: 0.2s; z-index: 5; padding: 0; line-height: 1; }
+    .task-card.expanded .task-close-btn { display: flex; }
+    .task-close-btn:active { transform: scale(0.85); background: #666; }
+
     @media (max-width: 480px) {
       body { padding: 6px; }
       .header-sticky h1 { font-size: 0.95rem; }
@@ -247,6 +264,7 @@
       .weekdays { font-size: 0.5rem; }
       .header-sticky h1 { font-size: 0.8rem; }
       .filter-bar button { padding: 5px 10px; font-size: 0.65rem; }
+      #leadsList { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -365,6 +383,11 @@
       </div>
       <input class="lead-search-input" id="leadSearchInput" type="text" placeholder="جستجو بر اساس نام..." oninput="renderLeads()">
       <div id="leadsList"></div>
+    </div>
+
+    <!-- مودال لیدها -->
+    <div id="leadModal" onclick="if(event.target===this)closeLeadModal()">
+      <div class="modal-content"></div>
     </div>
 
     <div class="bottom-nav" id="bottomNav">
